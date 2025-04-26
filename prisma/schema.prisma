@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id           String          @id @default(cuid())
+  name         String          @db.VarChar(50)
+  email        String          @db.VarChar(100)
+  password     String          @db.VarChar(100)
+  created_at   DateTime        @default(now())
+  updated_at   DateTime?
+  role         Roles           @relation(fields: [roleId], references: [id])
+  roleId       Int
+  Subscription Subscriptions[]
+  RefreshToken RefreshTokens[]
+}
+
+model Roles {
+  id             Int              @id @default(autoincrement())
+  name           String           @unique @db.VarChar(50)
+  description    String           @default("") @db.VarChar(300)
+  users          Users[]
+  permissionRole PermissionRole[]
+}
+
+model Permissions {
+  id             Int              @id @default(autoincrement())
+  name           String           @db.VarChar(50)
+  description    String           @default("") @db.VarChar(300)
+  permissionRole PermissionRole[]
+}
+
+model PermissionRole {
+  create       Boolean     @default(false)
+  read         Boolean     @default(false)
+  update       Boolean     @default(false)
+  delete       Boolean     @default(false)
+  role         Roles       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  roleId       Int
+  permission   Permissions @relation(fields: [permissionId], references: [id])
+  permissionId Int
+
+  @@unique([roleId, permissionId])
+}
+
+model Subscriptions {
+  id                   String    @id @default(cuid())
+  name                 String
+  userId               String
+  status               String
+  startDate            DateTime
+  endDate              DateTime
+  stripeSubscriptionId String
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime?
+
+  user Users @relation(fields: [userId], references: [id])
+}
+
+model RefreshTokens {
+  id        String    @id @default(cuid())
+  token     String    @unique
+  expiresAt DateTime
+  userId    String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime?
+
+  user Users @relation(fields: [userId], references: [id])
+}
