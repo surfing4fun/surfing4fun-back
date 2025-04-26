@@ -1,0 +1,161 @@
+generator bhop {
+  provider = "prisma-client-js"
+  output   = "client"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL_BHOP")
+}
+
+model chat {
+  auth      Int     @id
+  name      Int     @default(0)
+  ccname    String? @db.VarChar(128)
+  message   Int     @default(0)
+  ccmessage String? @db.VarChar(16)
+  ccaccess  Int     @default(0)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model ljtop {
+  ljtable       String? @db.VarChar(16)
+  name          String? @db.VarChar(64)
+  steamid       String? @db.VarChar(32)
+  distance      Float?  @db.Float
+  prestrafe     Float?  @db.Float
+  strafes       Int?
+  sync          Float?  @db.Float
+  maxspeed      Float?  @db.Float
+  totalticks    Float?  @db.Float
+  syncedangle   Float?  @db.Float
+  totalangle    Float?  @db.Float
+  heightdelta   Float?  @db.Float
+  blockdistance Float?  @db.Float
+  trajectory    Float?  @db.Float
+  timestamp     Int?
+
+  @@ignore
+}
+
+model maptiers {
+  map                 String            @id @db.VarChar(255)
+  tier                Int               @default(1)
+  possible_on_400vel  Boolean?          @default(true)
+  possible_on_scroll  Boolean?          @default(true)
+  possible_on_stamina Boolean?          @default(true)
+  map_type            maptiers_map_type @default(Linear)
+}
+
+model mapzones {
+  id            Int     @id @default(autoincrement())
+  map           String  @db.VarChar(255)
+  type          Int?
+  corner1_x     Float?  @db.Float
+  corner1_y     Float?  @db.Float
+  corner1_z     Float?  @db.Float
+  corner2_x     Float?  @db.Float
+  corner2_y     Float?  @db.Float
+  corner2_z     Float?  @db.Float
+  destination_x Float   @default(0) @db.Float
+  destination_y Float   @default(0) @db.Float
+  destination_z Float   @default(0) @db.Float
+  track         Int     @default(0)
+  flags         Int     @default(0)
+  data          Int     @default(0)
+  form          Int?    @db.TinyInt
+  target        String? @db.VarChar(63)
+}
+
+model migrations {
+  code Int @id @db.TinyInt
+}
+
+model playertimes {
+  id          Int    @id @default(autoincrement())
+  style       Int    @default(0) @db.TinyInt
+  track       Int    @default(0) @db.TinyInt
+  time        Float  @db.Float
+  auth        Int?
+  map         String @db.VarChar(255)
+  points      Float  @default(0) @db.Float
+  jumps       Int?
+  date        Int?
+  strafes     Int?
+  sync        Float? @db.Float
+  perfs       Float? @default(0) @db.Float
+  completions Int?   @default(1) @db.SmallInt
+  users       users? @relation(fields: [auth], references: [auth], onDelete: Restrict, onUpdate: Restrict, map: "pt_auth")
+
+  @@index([auth, date, points], map: "auth")
+  @@index([date(sort: Desc), auth, map, style, time, points, track], map: "idx_playertimes_covering")
+  @@index([date(sort: Desc)], map: "idx_playertimes_date_desc")
+  @@index([map, style, track, time], map: "map")
+  @@index([map], map: "map2")
+  @@index([time], map: "time")
+}
+
+model stagetimespb {
+  style Int    @db.TinyInt
+  track Int    @default(0) @db.TinyInt
+  map   String @db.VarChar(255)
+  stage Int    @db.TinyInt
+  auth  Int
+  time  Float  @db.Float
+
+  @@id([style, track, auth, map, stage])
+}
+
+model stagetimeswr {
+  style Int    @db.TinyInt
+  track Int    @default(0) @db.TinyInt
+  map   String @db.VarChar(255)
+  stage Int    @db.TinyInt
+  auth  Int
+  time  Float  @db.Float
+
+  @@id([style, track, map, stage])
+}
+
+model startpositions {
+  auth        Int
+  track       Int      @db.TinyInt
+  map         String   @db.VarChar(255)
+  pos_x       Float?   @db.Float
+  pos_y       Float?   @db.Float
+  pos_z       Float?   @db.Float
+  ang_x       Float?   @db.Float
+  ang_y       Float?   @db.Float
+  ang_z       Float?   @db.Float
+  angles_only Boolean?
+
+  @@id([auth, track, map])
+}
+
+model styleplaytime {
+  auth     Int
+  style    Int   @db.TinyInt
+  playtime Float @db.Float
+
+  @@id([auth, style])
+}
+
+model users {
+  auth        Int           @id
+  name        String?       @db.VarChar(32)
+  ip          Int?
+  lastlogin   Int           @default(-1)
+  points      Float         @default(0) @db.Float
+  playtime    Float         @default(0) @db.Float
+  firstlogin  Int           @default(dbgenerated("(unix_timestamp())"))
+  playertimes playertimes[]
+
+  @@index([ip], map: "ip")
+  @@index([lastlogin], map: "lastlogin")
+  @@index([points], map: "points")
+}
+
+enum maptiers_map_type {
+  Linear
+  Staged
+}

@@ -1,0 +1,182 @@
+generator surf {
+  provider = "prisma-client-js"
+  output   = "client"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL_SURF")
+}
+
+model chat {
+  auth      Int     @id
+  name      Int     @default(0)
+  ccname    String? @db.VarChar(128)
+  message   Int     @default(0)
+  ccmessage String? @db.VarChar(16)
+  ccaccess  Int     @default(0)
+}
+
+model cptimes {
+  style      Int    @db.TinyInt
+  track      Int    @default(0) @db.TinyInt
+  map        String @db.VarChar(255)
+  checkpoint Int    @db.TinyInt
+  auth       Int
+  time       Float  @db.Float
+  stage_time Float  @db.Float
+  attempts   Int    @db.SmallInt
+
+  @@id([style, track, auth, map, checkpoint])
+}
+
+model cpwrs {
+  style      Int    @db.TinyInt
+  track      Int    @default(0) @db.TinyInt
+  map        String @db.VarChar(255)
+  checkpoint Int    @db.TinyInt
+  auth       Int
+  time       Float  @db.Float
+  stage_time Float  @db.Float
+  attempts   Int    @db.SmallInt
+
+  @@id([style, track, map, checkpoint])
+}
+
+model maps_autobhop_settings {
+  map              String  @db.VarChar(255)
+  track            Int
+  autobhop_enabled Boolean @default(false)
+
+  @@id([map, track])
+}
+
+model maptiers {
+  map              String             @id @db.VarChar(255)
+  tier             Int                @default(1)
+  maxvelocity      BigInt?
+  autobhop_enabled Boolean?           @default(false)
+  map_type         maptiers_map_type? @default(Linear)
+}
+
+model mapzones {
+  id            Int     @id @default(autoincrement())
+  map           String  @db.VarChar(255)
+  type          Int?
+  corner1_x     Float?  @db.Float
+  corner1_y     Float?  @db.Float
+  corner1_z     Float?  @db.Float
+  corner2_x     Float?  @db.Float
+  corner2_y     Float?  @db.Float
+  corner2_z     Float?  @db.Float
+  destination_x Float   @default(0) @db.Float
+  destination_y Float   @default(0) @db.Float
+  destination_z Float   @default(0) @db.Float
+  track         Int     @default(0)
+  flags         Int     @default(0)
+  data          Int     @default(0)
+  speedlimit    Int     @default(1) @db.TinyInt
+  form          Int?    @db.TinyInt
+  target        String? @db.VarChar(63)
+}
+
+model migrations {
+  code Int @id @db.TinyInt
+}
+
+model playertimes {
+  id          Int    @id @default(autoincrement())
+  style       Int    @default(0) @db.TinyInt
+  track       Int    @default(0) @db.TinyInt
+  time        Float  @db.Float
+  auth        Int?
+  map         String @db.VarChar(255)
+  points      Float  @default(0) @db.Float
+  jumps       Int?
+  date        Int?
+  strafes     Int?
+  sync        Float? @db.Float
+  perfs       Float? @default(0) @db.Float
+  completions Int?   @default(1) @db.SmallInt
+  startvel    Float  @db.Float
+  endvel      Float  @db.Float
+  users       users? @relation(fields: [auth], references: [auth], onDelete: Restrict, onUpdate: Restrict, map: "pt_auth")
+
+  @@index([auth, date, points], map: "auth")
+  @@index([date(sort: Desc), auth, map, style, time, points, track], map: "idx_playertimes_covering")
+  @@index([date(sort: Desc)], map: "idx_playertimes_date_desc")
+  @@index([map, style, track, time], map: "map")
+  @@index([map], map: "map2")
+  @@index([time], map: "time")
+}
+
+model stagetimes {
+  id          Int    @id @default(autoincrement())
+  style       Int    @default(0) @db.TinyInt
+  track       Int    @default(0) @db.TinyInt
+  stage       Int    @db.TinyInt
+  time        Float  @db.Float
+  auth        Int
+  map         String @db.VarChar(255)
+  points      Float  @default(0) @db.Float
+  jumps       Int?
+  date        Int?
+  strafes     Int?
+  sync        Float? @db.Float
+  perfs       Float? @default(0) @db.Float
+  completions Int?   @default(1) @db.SmallInt
+  startvel    Float  @db.Float
+  endvel      Float  @db.Float
+  users       users  @relation(fields: [auth], references: [auth], onUpdate: Restrict, map: "st_auth")
+
+  @@index([auth, date, points], map: "auth")
+  @@index([map, style, track, stage, time], map: "map")
+  @@index([map], map: "map2")
+  @@index([time], map: "time")
+}
+
+model startpositions {
+  auth        Int
+  track       Int      @db.TinyInt
+  stage       Int      @db.TinyInt
+  map         String   @db.VarChar(255)
+  pos_x       Float?   @db.Float
+  pos_y       Float?   @db.Float
+  pos_z       Float?   @db.Float
+  ang_x       Float?   @db.Float
+  ang_y       Float?   @db.Float
+  ang_z       Float?   @db.Float
+  angles_only Boolean?
+
+  @@id([auth, track, map])
+}
+
+model styleplaytime {
+  auth     Int
+  style    Int   @db.TinyInt
+  playtime Float @db.Float
+
+  @@id([auth, style])
+}
+
+model users {
+  auth        Int           @id
+  name        String?       @db.VarChar(32)
+  ip          Int?
+  firstlogin  Int           @default(dbgenerated("(unix_timestamp())"))
+  lastlogin   Int           @default(-1)
+  points      Float         @default(0) @db.Float
+  playtime    Float         @default(0) @db.Float
+  playertimes playertimes[]
+  stagetimes  stagetimes[]
+
+  @@index([firstlogin], map: "firstlogin")
+  @@index([ip], map: "ip")
+  @@index([lastlogin], map: "lastlogin")
+  @@index([points], map: "points")
+}
+
+enum maptiers_map_type {
+  Staged
+  Linear
+}

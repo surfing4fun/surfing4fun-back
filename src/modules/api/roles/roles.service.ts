@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/modules/shared/prisma/prisma.service';
+import { DashboardPrismaService } from 'src/modules/shared/prisma/dashboard.service';
 import { EventsGateway } from 'src/modules/shared/events/events.gateway';
 
 import { CreateRoleDto } from './dto/create-role.dto';
@@ -8,7 +8,7 @@ import { UpdateRoleDto } from './dto/update-role.dto';
 @Injectable()
 export class RolesService {
   constructor(
-    private prismaService: PrismaService,
+    private prismaService: DashboardPrismaService,
     private eventsGateway: EventsGateway,
   ) {}
 

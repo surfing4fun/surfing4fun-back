@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { PrismaService } from 'src/modules/shared/prisma/prisma.service';
+import { DashboardPrismaService } from 'src/modules/shared/prisma/dashboard.service';
 
 import { User } from '../users/entity/user';
 
@@ -12,7 +12,7 @@ import { IAuthenticatedUser } from './dto/authenticate-user.dto';
 export class RefreshTokenService {
   constructor(
     private jwtService: JwtService,
-    private prismaService: PrismaService,
+    private prismaService: DashboardPrismaService,
   ) {}
 
   async generateRefreshToken(

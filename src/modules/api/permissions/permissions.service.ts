@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/modules/shared/prisma/prisma.service';
+import { DashboardPrismaService } from 'src/modules/shared/prisma/dashboard.service';
+import { Public } from 'src/decorators/Public';
 
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
 
 @Injectable()
 export class PermissionsService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(private prismaService: DashboardPrismaService) {}
+
+  @Public()
   create(createPermissionDto: CreatePermissionDto) {
     return this.prismaService.permissions.create({
       data: createPermissionDto,

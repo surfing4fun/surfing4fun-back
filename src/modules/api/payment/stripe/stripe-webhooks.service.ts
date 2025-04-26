@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import Stripe from 'stripe';
-import { PrismaService } from 'src/modules/shared/prisma/prisma.service';
+import { DashboardPrismaService } from 'src/modules/shared/prisma/dashboard.service';
 
 import { UsersService } from '../../users/users.service';
 
@@ -11,7 +11,7 @@ export class StripeWebhooksService {
   constructor(
     private usersService: UsersService,
     private stripeService: StripeService,
-    private prismaService: PrismaService,
+    private prismaService: DashboardPrismaService,
   ) {}
 
   // Called when the checkout session is completed

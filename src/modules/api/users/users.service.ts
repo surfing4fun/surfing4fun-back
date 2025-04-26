@@ -1,14 +1,14 @@
 import * as bcrypt from 'bcrypt';
 import { Injectable } from '@nestjs/common';
 
-import { PrismaService } from '../../shared/prisma/prisma.service';
+import { DashboardPrismaService } from '../../shared/prisma/dashboard.service';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(private prismaService: DashboardPrismaService) {}
 
   create(user: CreateUserDto) {
     const { email, name, password, roleId } = user;

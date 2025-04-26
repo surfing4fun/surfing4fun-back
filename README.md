@@ -32,6 +32,15 @@
 $ yarn install
 ```
 
+## Database configuration
+
+Make sure to add the database credentials on the `.env` file based on the `.env-example`
+
+```bash
+# generate the prisma client
+$ yarn db:generate
+```
+
 ## Running the app
 
 ```bash

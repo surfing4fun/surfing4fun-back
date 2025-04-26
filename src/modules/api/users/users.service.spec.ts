@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaModule } from 'src/modules/shared/prisma/prisma.module';
-import { PrismaService } from 'src/modules/shared/prisma/prisma.service';
+import { DashboardPrismaService } from 'src/modules/shared/prisma/dashboard.service';
 import * as bcrypt from 'bcrypt';
 
 import { RolesModule } from '../roles/roles.module';
@@ -15,7 +15,7 @@ jest.mock('bcrypt', () => ({
 
 describe('UsersService', () => {
   let service: UsersService;
-  let prismaService: PrismaService;
+  let prismaService: DashboardPrismaService;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -35,7 +35,7 @@ describe('UsersService', () => {
       users: {
         create: jest.fn().mockResolvedValue(null),
       },
-    } as unknown as PrismaService;
+    } as unknown as DashboardPrismaService;
 
     service = new UsersService(prismaService);
   });
