@@ -21,8 +21,8 @@ export class StripeWebhooksService {
     if (event.data.object.mode !== 'subscription') return;
 
     // Get the user from the database
-    const user = await this.usersService.findOne(
-      String(event.data.object.customer),
+    const user = await this.usersService.findByEmail(
+      String(event.data.object.customer_details.email),
     );
 
     // Would be good to create a new user account if the user doesn't exist

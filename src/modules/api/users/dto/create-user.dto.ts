@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 import { User } from '../entity/user';
 
@@ -12,21 +12,13 @@ export class CreateUserDto implements Partial<User> {
   })
   name: string;
 
-  @IsEmail()
+  @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    example: 'test@mail.com',
-    description: 'The email of the user',
+    example: '76561198116612863',
+    description: 'The steamId from the user steam account',
   })
-  email: string;
-
-  @MinLength(8)
-  @IsNotEmpty()
-  @ApiProperty({
-    example: 'R4ND0MP4$W0RD!',
-    description: 'The password of the user',
-  })
-  password: string;
+  steamId: string;
 
   @IsNotEmpty()
   @ApiProperty({

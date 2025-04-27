@@ -7,7 +7,6 @@ import { EmailModule } from 'src/modules/shared/email/email.module';
 import { UsersModule } from '../users/users.module';
 
 import { AuthService } from './auth.service';
-import { LocalStrategy } from './strategies/local.strategy';
 import { AuthController } from './auth.controller';
 import { jwtConstants } from './constants';
 import { JwtStrategy } from './strategies/jwt.strategy';
@@ -15,11 +14,13 @@ import { JwtAuthGuard } from './guards/jwt.guard';
 import { PermissionGuard } from './guards/permission.guard';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { RefreshTokenService } from './refresh-token.service';
+import { SteamAuthStrategy } from './strategies/steam.strategy';
 
 @Module({
   imports: [
     UsersModule,
     PassportModule,
+    PassportModule.register({ defaultStrategy: 'steam', session: true }),
     JwtModule.register({
       secret: jwtConstants.secret,
       signOptions: { expiresIn: jwtConstants.expiresIn },
@@ -29,9 +30,9 @@ import { RefreshTokenService } from './refresh-token.service';
   providers: [
     AuthService,
     RefreshTokenService,
-    LocalStrategy,
     JwtStrategy,
     JwtRefreshStrategy,
+    SteamAuthStrategy,
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,

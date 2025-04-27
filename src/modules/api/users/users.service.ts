@@ -1,4 +1,3 @@
-import * as bcrypt from 'bcrypt';
 import { Injectable } from '@nestjs/common';
 
 import { DashboardPrismaService } from '../../shared/prisma/dashboard.service';
@@ -11,18 +10,26 @@ export class UsersService {
   constructor(private prismaService: DashboardPrismaService) {}
 
   create(user: CreateUserDto) {
-    const { email, name, password, roleId } = user;
-
-    const hashedPassword = bcrypt.hashSync(password, 10);
+    const { name, roleId, steamId } = user;
 
     return this.prismaService.users.create({
       data: {
-        email,
         name,
-        password: hashedPassword,
+        steamId,
         role: {
           connect: {
             id: roleId,
+          },
+        },
+      },
+      include: {
+        role: {
+          include: {
+            permissionRole: {
+              include: {
+                permission: true,
+              },
+            },
           },
         },
       },
@@ -71,11 +78,26 @@ export class UsersService {
     });
   }
 
-  update(id: string, updateUserDto: UpdateUserDto) {
-    if (updateUserDto.password) {
-      updateUserDto.password = bcrypt.hashSync(updateUserDto.password, 10);
-    }
+  findBySteamId(steamId: string, withPermissions: boolean = false) {
+    return this.prismaService.users.findFirst({
+      where: { steamId },
+      ...(withPermissions && {
+        include: {
+          role: {
+            include: {
+              permissionRole: {
+                include: {
+                  permission: true,
+                },
+              },
+            },
+          },
+        },
+      }),
+    });
+  }
 
+  update(id: string, updateUserDto: UpdateUserDto) {
     return this.prismaService.users.update({
       where: { id },
       data: updateUserDto,
