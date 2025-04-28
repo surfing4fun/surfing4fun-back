@@ -43,14 +43,14 @@ export class AuthController {
     const authTokens = await this.authService.loginSteam(req.user);
 
     res.cookie('accessToken', authTokens.accessToken, {
-      httpOnly: true,
+      httpOnly: false,
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
       maxAge: 1 * 24 * 60 * 60 * 1000, // 1 days
     });
 
     res.cookie('refreshToken', authTokens.refreshToken, {
-      httpOnly: true,
+      httpOnly: false,
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { DevtoolsModule } from '@nestjs/devtools-integration';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import { UsersModule } from '../api/users/users.module';
 import { HealthModule } from '../api/health/health.module';
@@ -24,6 +25,7 @@ import { AppController } from './app.controller';
       http: process.env.NODE_ENV !== 'production',
     }),
     EventEmitterModule.forRoot(),
+    ScheduleModule.forRoot(),
     HealthModule,
     AuthModule,
     UsersModule,

@@ -59,25 +59,6 @@ export class UsersService {
     });
   }
 
-  findByEmail(email: string, withPermissions: boolean = false) {
-    return this.prismaService.users.findFirst({
-      where: { email },
-      ...(withPermissions && {
-        include: {
-          role: {
-            include: {
-              permissionRole: {
-                include: {
-                  permission: true,
-                },
-              },
-            },
-          },
-        },
-      }),
-    });
-  }
-
   findBySteamId(steamId: string, withPermissions: boolean = false) {
     return this.prismaService.users.findFirst({
       where: { steamId },
