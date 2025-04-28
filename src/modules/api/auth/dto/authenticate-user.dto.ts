@@ -29,6 +29,9 @@ export type TPermission = {
 export interface IAuthenticatedUser {
   sub: string;
   role: string;
+  avatar: string;
+  profile: string;
+  name: string;
   hasActiveSubscription: boolean;
   permissions: TPermission[];
 }

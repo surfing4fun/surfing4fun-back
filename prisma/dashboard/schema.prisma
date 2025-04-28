@@ -16,6 +16,8 @@ model Users {
   updated_at   DateTime?
   roleId       Int
   steamId      String?         @unique(map: "steamId_unique") @db.VarChar(100)
+  avatar       String?         @db.VarChar(100)
+  profile      String?         @db.VarChar(250)
   RefreshToken RefreshTokens[]
   Subscription Subscriptions[]
   role         Roles           @relation(fields: [roleId], references: [id])

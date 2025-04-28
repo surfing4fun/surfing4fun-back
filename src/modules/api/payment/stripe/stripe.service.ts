@@ -45,6 +45,13 @@ export class StripeService {
     }
   }
 
+  async createBillingPortalSession(params: {
+    customer: string;
+    return_url: string;
+  }): Promise<Stripe.BillingPortal.Session> {
+    return this.api.billingPortal.sessions.create(params);
+  }
+
   async createCustomer(customer: StripeSDK.CustomerCreateParams) {
     return this.api.customers.create(customer);
   }

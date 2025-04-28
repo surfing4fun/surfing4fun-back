@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Body,
   Controller,
@@ -44,7 +45,6 @@ export class StripeController {
         throw new NotFoundException('User not found');
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { roleId, steamId, created_at, updated_at, ...filteredUser } = user;
 
       customer = await this.stripeService.createCustomer(filteredUser);
@@ -65,6 +65,26 @@ export class StripeController {
       success_url: process.env.STRIPE_SUCCESS_URL,
       cancel_url: process.env.STRIPE_CANCEL_URL,
     });
+  }
+
+  @Post('customers/:customer_id/billing-portal')
+  async createBillingPortal(@Param('customer_id') customerId: string) {
+    let customer = await this.stripeService
+      .getCustomer(customerId)
+      .catch(() => null);
+    if (!customer) {
+      const user = await this.usersService.findOne(customerId);
+      if (!user) throw new NotFoundException('User not found');
+      const { roleId, steamId, created_at, updated_at, ...rest } = user;
+      customer = await this.stripeService.createCustomer(rest);
+    }
+
+    const session = await this.stripeService.createBillingPortalSession({
+      customer: customer.id,
+      return_url: process.env.STRIPE_BILLING_PORTAL_RETURN_URL,
+    });
+
+    return { url: session.url };
   }
 
   @Get('products')

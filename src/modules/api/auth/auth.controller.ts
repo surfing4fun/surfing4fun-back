@@ -82,6 +82,9 @@ export class AuthController {
     const payload = {
       sub: req.user.id,
       role: req.user.role.name,
+      avatar: req.user.avatar,
+      profile: req.user.profile,
+      name: req.user.name,
       hasActiveSubscription: !!hasActiveSubscription,
       permissions: normalizedPermissions,
     };
@@ -97,7 +100,6 @@ export class AuthController {
   @ApiBearerAuth()
   @Get('/me')
   async me(@Request() req) {
-    console.log('USER: ', req.user);
     const user = await this.usersService.findOne(req.user.sub, {
       withPermissions: true,
     });

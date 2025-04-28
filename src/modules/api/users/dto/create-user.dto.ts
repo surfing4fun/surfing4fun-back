@@ -26,4 +26,20 @@ export class CreateUserDto implements Partial<User> {
     description: 'The role id of the user',
   })
   roleId: number;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    example: 'http://imageurl.com',
+    description: 'The avatar image from the steam account',
+  })
+  avatar: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    example: '76561198116612863',
+    description: 'The steam profile url',
+  })
+  profile: string;
 }

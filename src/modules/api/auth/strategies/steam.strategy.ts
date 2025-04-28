@@ -29,6 +29,13 @@ export class SteamAuthStrategy extends PassportStrategy(
         steamId,
         name: displayName,
         roleId: 3,
+        avatar: profile._json.avatarmedium,
+        profile: profile._json.profileurl,
+      });
+    } else {
+      user = await this.usersService.update(user.id, {
+        avatar: profile._json.avatarmedium,
+        profile: profile._json.profileurl,
       });
     }
 

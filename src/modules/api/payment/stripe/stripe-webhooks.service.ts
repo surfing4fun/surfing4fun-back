@@ -118,9 +118,7 @@ export class StripeWebhooksService {
         id: subscription.id,
       },
       data: {
-        status: subscription.status,
-        startDate: new Date(subscription.current_period_start * 1000),
-        endDate: new Date(subscription.current_period_end * 1000),
+        status: 'active',
       },
     });
   }
@@ -311,6 +309,9 @@ export class StripeWebhooksService {
           sub: userId,
           permissions: normalizedPermissions,
           role: user.role.name,
+          avatar: user.avatar,
+          profile: user.profile,
+          name: user.name,
           hasActiveSubscription: !!hasActiveSubscription,
         };
 

@@ -10,6 +10,8 @@ interface IRole extends Partial<Role> {
 export class User {
   id: string;
   name: string;
+  avatar: string;
+  profile: string;
   @Exclude()
   roleId: number;
   role: IRole;

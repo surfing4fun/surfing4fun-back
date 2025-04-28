@@ -82,6 +82,17 @@ export class UsersService {
     return this.prismaService.users.update({
       where: { id },
       data: updateUserDto,
+      include: {
+        role: {
+          include: {
+            permissionRole: {
+              include: {
+                permission: true,
+              },
+            },
+          },
+        },
+      },
     });
   }
 

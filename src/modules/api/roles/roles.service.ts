@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { DashboardPrismaService } from 'src/modules/shared/prisma/dashboard.service';
 import { EventsGateway } from 'src/modules/shared/events/events.gateway';
 
 import { RefreshTokenService } from '../auth/refresh-token.service';
 import { PaymentService } from '../payment/payment.service';
+import { UsersService } from '../users/users.service';
 
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
@@ -15,6 +16,7 @@ export class RolesService {
     private eventsGateway: EventsGateway,
     private refreshTokenService: RefreshTokenService,
     private paymentService: PaymentService,
+    private usersService: UsersService,
   ) {}
 
   create(createRoleDto: CreateRoleDto) {
@@ -120,6 +122,10 @@ export class RolesService {
 
         const userId = client.user.sub;
 
+        const user = await this.usersService.findOne(userId);
+
+        if (!user) throw new NotFoundException('User not found!');
+
         // Check if there's an active subscription for the current user
         const hasActiveSubscription =
           await this.paymentService.getActiveSubscription(userId);
@@ -127,11 +133,12 @@ export class RolesService {
         const payload = {
           sub: userId,
           permissions,
+          avatar: user.avatar,
+          profile: user.profile,
+          name: user.name,
           role: updatedRole.name,
           hasActiveSubscription: !!hasActiveSubscription,
         };
-
-        console.log('PAYLOAD: ', payload);
 
         const accessToken =
           await this.refreshTokenService.generateAccessToken(payload);

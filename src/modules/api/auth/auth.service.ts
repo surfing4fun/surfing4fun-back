@@ -24,6 +24,9 @@ export class AuthService {
     const payload = {
       sub: user.id,
       role: user.role.name,
+      avatar: user.avatar,
+      profile: user.profile,
+      name: user.name,
       hasActiveSubscription: !!hasActiveSubscription,
       permissions: normalizedPermissions,
     };
