@@ -57,19 +57,23 @@ export class RefreshTokenService {
   }
 
   async generateTokenPair(
-    user: User,
+    user: Pick<User, 'id'>,
     payload: IAuthenticatedUser,
     currentRefreshToken?: string,
     currentRefreshTokenExpiresAt?: Date,
   ) {
     return {
-      accessToken: this.jwtService.sign(payload), // jwt module is configured in auth.module.ts for access token
+      accessToken: this.jwtService.sign(payload),
       refreshToken: await this.generateRefreshToken(
         user.id,
         currentRefreshToken,
         currentRefreshTokenExpiresAt,
       ),
     };
+  }
+
+  generateAccessToken(payload: IAuthenticatedUser) {
+    return this.jwtService.sign(payload);
   }
 
   @Cron(CronExpression.EVERY_DAY_AT_3AM)

@@ -2,6 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { DashboardPrismaService } from 'src/modules/shared/prisma/dashboard.service';
 import { EventsGateway } from 'src/modules/shared/events/events.gateway';
 
+import { RefreshTokenService } from '../auth/refresh-token.service';
+import { PaymentService } from '../payment/payment.service';
+
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 
@@ -10,6 +13,8 @@ export class RolesService {
   constructor(
     private prismaService: DashboardPrismaService,
     private eventsGateway: EventsGateway,
+    private refreshTokenService: RefreshTokenService,
+    private paymentService: PaymentService,
   ) {}
 
   create(createRoleDto: CreateRoleDto) {
@@ -99,8 +104,7 @@ export class RolesService {
     });
 
     // Emit a websocket event to clients with the same role
-    this.eventsGateway.io.sockets.sockets.forEach(async (client) => {
-      console.log('CLIENT: ', client);
+    this.eventsGateway.io.sockets.sockets.forEach(async (client: any) => {
       // Check if the client's role matches
       if (client.user.role.toLowerCase() === updatedRole.name.toLowerCase()) {
         // Get the updated role with permissions from database
@@ -114,9 +118,29 @@ export class RolesService {
           }),
         );
 
-        // Emit the updated role with permissions to the client
-        client.emit('roles:update', {
+        const userId = client.user.sub;
+
+        // Check if there's an active subscription for the current user
+        const hasActiveSubscription =
+          await this.paymentService.getActiveSubscription(userId);
+
+        const payload = {
+          sub: userId,
           permissions,
+          role: updatedRole.name,
+          hasActiveSubscription: !!hasActiveSubscription,
+        };
+
+        console.log('PAYLOAD: ', payload);
+
+        const accessToken =
+          await this.refreshTokenService.generateAccessToken(payload);
+
+        // Emit the updated role with permissions to the client
+        client.emit('auth:update', {
+          permissions,
+          hasActiveSubscription: !!hasActiveSubscription,
+          accessToken,
         });
       }
     });

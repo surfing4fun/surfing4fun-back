@@ -2,15 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { EmailService } from 'src/modules/shared/email/email.service';
 import { normalizePermissions } from 'src/utils/normalizePermissions';
 
-import { UsersService } from '../users/users.service';
 import { User } from '../users/entity/user';
+import { PaymentService } from '../payment/payment.service';
 
 import { RefreshTokenService } from './refresh-token.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
+    private paymentService: PaymentService,
     private emailService: EmailService,
     private refreshTokenService: RefreshTokenService,
   ) {}
@@ -18,9 +18,13 @@ export class AuthService {
   async loginSteam(user: User) {
     const normalizedPermissions = normalizePermissions(user);
 
+    const hasActiveSubscription =
+      await this.paymentService.getActiveSubscription(user.id);
+
     const payload = {
       sub: user.id,
       role: user.role.name,
+      hasActiveSubscription: !!hasActiveSubscription,
       permissions: normalizedPermissions,
     };
 

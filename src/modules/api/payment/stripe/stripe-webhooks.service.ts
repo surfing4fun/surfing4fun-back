@@ -2,8 +2,12 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import Stripe from 'stripe';
 import { DashboardPrismaService } from 'src/modules/shared/prisma/dashboard.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { normalizePermissions } from 'src/utils/normalizePermissions';
+import { EventsGateway } from 'src/modules/shared/events/events.gateway';
 
 import { UsersService } from '../../users/users.service';
+import { RefreshTokenService } from '../../auth/refresh-token.service';
+import { PaymentService } from '../payment.service';
 
 import { StripeService } from './stripe.service';
 
@@ -14,7 +18,10 @@ export class StripeWebhooksService {
   constructor(
     private usersService: UsersService,
     private stripeService: StripeService,
+    private paymentService: PaymentService,
     private prismaService: DashboardPrismaService,
+    private refreshTokenService: RefreshTokenService,
+    private eventsGateway: EventsGateway,
   ) {}
 
   // Called when the checkout session is completed
@@ -26,16 +33,13 @@ export class StripeWebhooksService {
 
     // 1️⃣ Handle one-time payments via the shared helper
     if (mode === 'payment') {
-      // session.payment_method_types is an array like ['card'], ['pix'], ['boleto'], etc.
-      const methods = session.payment_method_types || [];
-
-      if (methods.includes('boleto')) {
-        // Boleto: create a pending record; will be updated to 'active' or 'failed'
-        await this._recordOneTimePayment(session, 'pending');
-      } else {
-        // Card, PIX, etc.: immediately active
-        await this._recordOneTimePayment(session, 'active');
-      }
+      const paid = session.payment_status === 'paid';
+      await this._recordOneTimePayment(
+        session,
+        paid
+          ? 'active' // card/PIX immediately active
+          : 'pending', // boleto stays pending until async_payment_succeeded
+      );
       return;
     }
 
@@ -83,6 +87,8 @@ export class StripeWebhooksService {
           type: subscriptionType,
         },
       });
+
+      await this._emitSubscriptionUpdate(user.id);
     }
   }
 
@@ -199,6 +205,8 @@ export class StripeWebhooksService {
         where: { id: existing.id },
         data: { status: 'failed' },
       });
+
+      await this._emitSubscriptionUpdate(existing.userId);
     } else {
       // if you want to create it even on failure:
       await this._recordOneTimePayment(session, 'failed');
@@ -251,6 +259,8 @@ export class StripeWebhooksService {
         type: subscriptionType,
       },
     });
+
+    await this._emitSubscriptionUpdate(user.id);
   }
 
   /**
@@ -277,5 +287,42 @@ export class StripeWebhooksService {
         `Marked ${result.count} one-time payment subscription(s) as expired.`,
       );
     }
+  }
+
+  /**
+   * Emit a websocket event to the given user with a fresh token
+   */
+  private async _emitSubscriptionUpdate(userId: string) {
+    this.eventsGateway.io.sockets.sockets.forEach(async (client: any) => {
+      // Check if the client's id matches
+      if (client.user.sub.toLowerCase() === userId) {
+        // Get the updated role with permissions from database
+        const user = await this.usersService.findOne(userId, {
+          withPermissions: true,
+        });
+
+        const normalizedPermissions = normalizePermissions(user);
+
+        // Check if there's an active subscription for the current user
+        const hasActiveSubscription =
+          await this.paymentService.getActiveSubscription(userId);
+
+        const payload = {
+          sub: userId,
+          permissions: normalizedPermissions,
+          role: user.role.name,
+          hasActiveSubscription: !!hasActiveSubscription,
+        };
+
+        const accessToken =
+          await this.refreshTokenService.generateAccessToken(payload);
+
+        client.emit('auth:update', {
+          permissions: normalizedPermissions,
+          hasActiveSubscription: !!hasActiveSubscription,
+          accessToken,
+        });
+      }
+    });
   }
 }

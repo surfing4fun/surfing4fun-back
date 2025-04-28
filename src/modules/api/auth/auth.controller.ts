@@ -92,6 +92,7 @@ export class AuthController {
   @ApiBearerAuth()
   @Get('/me')
   async me(@Request() req) {
+    console.log('USER: ', req.user);
     const user = await this.usersService.findOne(req.user.sub, {
       withPermissions: true,
     });

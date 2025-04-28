@@ -17,8 +17,6 @@ export class EmailService {
       },
     };
 
-    console.log('smtpTrasportOptions: ', smtpTrasportOptions);
-
     this.from = process.env.SMTP_FROM || 'noreply@example.com';
     this.transporter = nodemailer.createTransport(smtpTrasportOptions);
   }
