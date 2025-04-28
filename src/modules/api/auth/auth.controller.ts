@@ -16,6 +16,7 @@ import { normalizePermissions } from 'src/utils/normalizePermissions';
 import { AuthGuard } from '@nestjs/passport';
 
 import { UsersService } from '../users/users.service';
+import { PaymentService } from '../payment/payment.service';
 
 import { AuthService } from './auth.service';
 import { JwtRefreshAuthGuard } from './guards/jwt-refresh-auth.guard';
@@ -28,6 +29,7 @@ export class AuthController {
     private authService: AuthService,
     private usersService: UsersService,
     private refreshToeknService: RefreshTokenService,
+    private paymentService: PaymentService,
   ) {}
 
   @Public()
@@ -67,17 +69,20 @@ export class AuthController {
   @Public()
   @UseGuards(JwtRefreshAuthGuard)
   @Post('refresh')
-  refreshTokens(@Request() req) {
+  async refreshTokens(@Request() req) {
     if (!req.user) {
       throw new InternalServerErrorException();
     }
 
     const normalizedPermissions = normalizePermissions(req.user);
 
+    const hasActiveSubscription =
+      await this.paymentService.getActiveSubscription(req.user.id);
+
     const payload = {
-      email: req.user.email,
       sub: req.user.id,
       role: req.user.role.name,
+      hasActiveSubscription: !!hasActiveSubscription,
       permissions: normalizedPermissions,
     };
 
