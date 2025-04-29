@@ -1,5 +1,6 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { PrismaClient } from 'prisma/dashboard/client';
+
+import { PrismaClient } from '../../../../prisma/dashboard/client';
 
 @Injectable()
 export class DashboardPrismaService
