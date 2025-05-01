@@ -2,7 +2,6 @@ import { Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { IAuthenticatedUser } from 'src/modules/api/auth/dto/authenticate-user.dto';
 import { JwtStrategy } from 'src/modules/api/auth/strategies/jwt.strategy';
-import { jwtConstants } from 'src/modules/api/auth/constants';
 
 type SocketMiddleware = (socket: Socket, next: (err?: Error) => void) => void;
 
