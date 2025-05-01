@@ -23,7 +23,7 @@ describe('AuthController', () => {
         UsersModule,
         PassportModule,
         JwtModule.register({
-          secret: jwtConstants.secret,
+          secret: process.env.ACCESS_TOKEN_SECRET,
           signOptions: { expiresIn: jwtConstants.expiresIn },
         }),
       ],

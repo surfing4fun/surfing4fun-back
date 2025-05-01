@@ -5,14 +5,13 @@ import session from 'express-session';
 
 import { AppModule } from './modules/app/app.module';
 import { validatorOptions } from './configs/validator-options';
-import { sessionConstants } from './modules/api/auth/constants';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     snapshot: true,
     cors: {
       credentials: true,
-      origin: 'http://localhost:3000',
+      origin: ['http://localhost:3010', 'https://surfing4.fun'],
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     },
     rawBody: true,
@@ -32,7 +31,7 @@ async function bootstrap() {
 
   app.use(
     session({
-      secret: sessionConstants.secret,
+      secret: process.env.SESSION_SECRET,
       resave: false,
       saveUninitialized: false,
     }),

@@ -23,7 +23,7 @@ export class RefreshTokenService {
     const newRefreshToken = this.jwtService.sign(
       { sub: authUserId },
       {
-        secret: jwtConstants.refreshSecret,
+        secret: process.env.REFRESH_TOKEN_SECRET,
         expiresIn: jwtConstants.refreshExpiresIn,
       },
     );

@@ -21,7 +21,7 @@ export const AuthenticateWebsocketMiddleware = (
 
       try {
         payload = await jwtService.verifyAsync<IAuthenticatedUser>(token, {
-          secret: jwtConstants.secret,
+          secret: process.env.ACCESS_TOKEN_SECRET,
         });
       } catch (error) {
         throw new Error('Authorization token is invalid');

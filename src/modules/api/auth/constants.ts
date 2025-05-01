@@ -1,10 +1,4 @@
 export const jwtConstants = {
-  secret: 'PQW!@aASD@AQZ51',
-  expiresIn: '5m',
-  refreshSecret: 'PQW!@aASD@AQZ51QA13!',
+  expiresIn: '1m',
   refreshExpiresIn: '30d',
-};
-
-export const sessionConstants = {
-  secret: 'PQW!@aASD@AQZ51',
 };

@@ -23,7 +23,7 @@ import { SteamAuthStrategy } from './strategies/steam.strategy';
     PassportModule,
     PassportModule.register({ defaultStrategy: 'steam', session: true }),
     JwtModule.register({
-      secret: jwtConstants.secret,
+      secret: process.env.ACCESS_TOKEN_SECRET,
       signOptions: { expiresIn: jwtConstants.expiresIn },
     }),
     EmailModule,

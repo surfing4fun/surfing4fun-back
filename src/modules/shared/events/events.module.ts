@@ -8,7 +8,7 @@ import { EventsGateway } from './events.gateway';
   providers: [EventsGateway],
   imports: [
     JwtModule.register({
-      secret: jwtConstants.secret,
+      secret: process.env.ACCESS_TOKEN_SECRET,
       signOptions: { expiresIn: jwtConstants.expiresIn },
     }),
   ],
