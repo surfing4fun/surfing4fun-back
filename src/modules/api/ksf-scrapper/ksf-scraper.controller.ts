@@ -19,8 +19,8 @@ import {
 import { KsfScraperService } from './ksf-scrapper.service';
 
 @Public()
-@ApiTags('scraper')
-@Controller('scraper')
+@ApiTags('ksf-scraper')
+@Controller('ksf-scraper')
 export class KsfScraperController {
   constructor(private readonly scraperService: KsfScraperService) {}
 
