@@ -45,7 +45,16 @@ export class StripeController {
         throw new NotFoundException('User not found');
       }
 
-      const { roleId, steamId, created_at, updated_at, ...filteredUser } = user;
+      const {
+        roleId,
+        steamId,
+        created_at,
+        updated_at,
+        avatar,
+        profile,
+        role,
+        ...filteredUser
+      } = user;
 
       customer = await this.stripeService.createCustomer(filteredUser);
     }
@@ -75,7 +84,17 @@ export class StripeController {
     if (!customer) {
       const user = await this.usersService.findOne(customerId);
       if (!user) throw new NotFoundException('User not found');
-      const { roleId, steamId, created_at, updated_at, ...rest } = user;
+
+      const {
+        roleId,
+        steamId,
+        created_at,
+        updated_at,
+        avatar,
+        profile,
+        role,
+        ...rest
+      } = user;
       customer = await this.stripeService.createCustomer(rest);
     }
 

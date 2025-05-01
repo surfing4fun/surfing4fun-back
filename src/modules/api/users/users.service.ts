@@ -10,7 +10,7 @@ export class UsersService {
   constructor(private prismaService: DashboardPrismaService) {}
 
   create(user: CreateUserDto) {
-    const { name, roleId, steamId } = user;
+    const { name, roleId, steamId, avatar, profile } = user;
 
     return this.prismaService.users.create({
       data: {
@@ -21,6 +21,8 @@ export class UsersService {
             id: roleId,
           },
         },
+        avatar,
+        profile,
       },
       include: {
         role: {
