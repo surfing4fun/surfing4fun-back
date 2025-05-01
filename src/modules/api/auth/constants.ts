@@ -8,7 +8,7 @@ export const jwtConstants = {
 export const cookieConstants = {
   httpOnly: true,
   secure: isProd,
-  sameSite: isProd ? ('none' as const) : ('lax' as const),
+  sameSite: 'none' as const,
   path: '/',
-  ...(isProd ? { domain: '.surfing4.fun' } : {}),
+  domain: isProd ? '.surfing4.fun' : undefined,
 };
