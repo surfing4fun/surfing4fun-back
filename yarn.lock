@@ -7962,6 +7962,11 @@ source-map@^0.6.0, source-map@^0.6.1:
   resolved "https://registry.npmjs.org/source-map/-/source-map-0.6.1.tgz"
   integrity sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==
 
+source-server-query@^3.0.3:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/source-server-query/-/source-server-query-3.0.3.tgz#92deafe93c5b686a7fe7d62c8bc368385a1f8560"
+  integrity sha512-+GnbpZ89Tc+Op18pogPNY1xBOEVSa7oOsWHQcsem/P1rEr5/p4MpKQGZ8jXtQBmcQmfhZdr95YGPAo/esqQ+og==
+
 split@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/split/-/split-1.0.1.tgz#605bd9be303aa59fb35f9229fbea0ddec9ea07d9"
