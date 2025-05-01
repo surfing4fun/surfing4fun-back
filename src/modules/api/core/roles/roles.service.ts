@@ -3,8 +3,8 @@ import { DashboardPrismaService } from 'src/modules/shared/prisma/dashboard.serv
 import { EventsGateway } from 'src/modules/shared/events/events.gateway';
 
 import { RefreshTokenService } from '../auth/refresh-token.service';
-import { PaymentService } from '../payment/payment.service';
 import { UsersService } from '../users/users.service';
+import { PaymentService } from '../../payment/payment.service';
 
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';

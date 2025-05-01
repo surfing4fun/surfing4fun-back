@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { EventsModule } from 'src/modules/shared/events/events.module';
 
-import { UsersService } from '../../users/users.service';
 import { PaymentService } from '../payment.service';
-import { AuthModule } from '../../auth/auth.module';
+import { UsersService } from '../../core/users/users.service';
+import { AuthModule } from '../../core/auth/auth.module';
 
 import { StripeController } from './stripe.controller';
 import { StripeService } from './stripe.service';

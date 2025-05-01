@@ -14,7 +14,7 @@ import {
 import { Public } from 'src/decorators/Public';
 import { ApiTags } from '@nestjs/swagger';
 
-import { UsersService } from '../../users/users.service';
+import { UsersService } from '../../core/users/users.service';
 
 import { StripeService } from './stripe.service';
 import { StripeWebhooksService } from './stripe-webhooks.service';

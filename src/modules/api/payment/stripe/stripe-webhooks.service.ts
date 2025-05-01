@@ -5,9 +5,9 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { normalizePermissions } from 'src/utils/normalizePermissions';
 import { EventsGateway } from 'src/modules/shared/events/events.gateway';
 
-import { UsersService } from '../../users/users.service';
-import { RefreshTokenService } from '../../auth/refresh-token.service';
 import { PaymentService } from '../payment.service';
+import { UsersService } from '../../core/users/users.service';
+import { RefreshTokenService } from '../../core/auth/refresh-token.service';
 
 import { StripeService } from './stripe.service';
 

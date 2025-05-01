@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-
-import { DashboardPrismaService } from '../../shared/prisma/dashboard.service';
+import { DashboardPrismaService } from 'src/modules/shared/prisma/dashboard.service';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';

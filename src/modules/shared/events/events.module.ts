@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { jwtConstants } from 'src/modules/api/auth/constants';
+import { jwtConstants } from 'src/modules/api/core/auth/constants';
 
 import { EventsGateway } from './events.gateway';
 

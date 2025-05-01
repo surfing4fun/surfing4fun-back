@@ -1,11 +1,11 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { APP_GUARD } from '@nestjs/core';
 import { EmailModule } from 'src/modules/shared/email/email.module';
 
-import { UsersModule } from '../users/users.module';
-import { PaymentService } from '../payment/payment.service';
+import { PaymentService } from '../../payment/payment.service';
+import { UsersService } from '../users/users.service';
 
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
@@ -19,7 +19,6 @@ import { SteamAuthStrategy } from './strategies/steam.strategy';
 
 @Module({
   imports: [
-    forwardRef(() => UsersModule),
     PassportModule,
     PassportModule.register({ defaultStrategy: 'steam', session: true }),
     JwtModule.register({
@@ -43,6 +42,7 @@ import { SteamAuthStrategy } from './strategies/steam.strategy';
       useClass: PermissionGuard,
     },
     PaymentService,
+    UsersService,
   ],
   controllers: [AuthController],
   exports: [AuthService, RefreshTokenService, JwtModule],

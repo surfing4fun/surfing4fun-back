@@ -14,7 +14,7 @@ import { normalizePermissions } from 'src/utils/normalizePermissions';
 import { AuthGuard } from '@nestjs/passport';
 
 import { UsersService } from '../users/users.service';
-import { PaymentService } from '../payment/payment.service';
+import { PaymentService } from '../../payment/payment.service';
 
 import { AuthService } from './auth.service';
 import { JwtRefreshAuthGuard } from './guards/jwt-refresh-auth.guard';
