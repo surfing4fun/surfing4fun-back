@@ -14,6 +14,7 @@ import { SseModule } from '../shared/sse/sse.module';
 import { PaymentModule } from '../api/payment/payment.module';
 import { EventsModule } from '../shared/events/events.module';
 import { StripeModule } from '../api/payment/stripe/stripe.module';
+import { KsfScraperModule } from '../api/ksf-scrapper/ksf-scraper.module';
 
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
@@ -36,6 +37,7 @@ import { AppController } from './app.controller';
     PaymentModule,
     StripeModule,
     EventsModule,
+    KsfScraperModule,
   ],
   controllers: [AppController],
   providers: [AppService],
