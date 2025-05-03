@@ -5,6 +5,7 @@ import { MaptiersModule } from './maptiers/maptiers.module';
 import { UsersModule } from './users/users.module';
 import { ServerStatusModule } from './server-status/server-status.module';
 import { RecentTimesModule } from './recent-times/recent-times.module';
+import { RecentRecordsModule } from './recent-records/recent-records.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { RecentTimesModule } from './recent-times/recent-times.module';
     UsersModule,
     ServerStatusModule,
     RecentTimesModule,
+    RecentRecordsModule,
     RouterModule.register([
       {
         path: 'surf',
@@ -20,6 +22,7 @@ import { RecentTimesModule } from './recent-times/recent-times.module';
           UsersModule,
           ServerStatusModule,
           RecentTimesModule,
+          RecentRecordsModule,
         ],
       },
     ]),
