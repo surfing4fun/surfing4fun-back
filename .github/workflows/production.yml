@@ -29,4 +29,4 @@ jobs:
             yarn install --frozen-lockfile
             yarn db:generate
             yarn build
-            npx pm2 restart dashboard-api --update-env
+            /usr/local/bin/pm2 restart dashboard-api --update-env
