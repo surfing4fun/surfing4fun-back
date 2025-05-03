@@ -101,7 +101,7 @@ export class KsfScraperService {
       let targetUrl = url;
       if (value !== '0') {
         targetUrl = `https://ksf.surf/maps/${mapName}?zone=${value}`;
-        if (styleParam) targetUrl += `&style=${styleParam}`;
+        if (styleParam) targetUrl += `&mode=${styleParam}`;
       }
 
       try {
