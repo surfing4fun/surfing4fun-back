@@ -6,7 +6,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { Public } from 'src/decorators/Public';
+import { Public } from 'src/decorators/Public.decorator';
 import {
   ApiBadRequestResponse,
   ApiOkResponse,

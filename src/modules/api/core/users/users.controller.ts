@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { SseService } from 'src/modules/shared/sse/sse.service';
-import { AllowPermissions } from 'src/decorators/AllowPermissions';
+import { AllowPermissions } from 'src/decorators/AllowPermissions.decorator';
 
 import { RolesService } from '../roles/roles.service';
 import { EPermission } from '../permissions/entities/permission.entity';

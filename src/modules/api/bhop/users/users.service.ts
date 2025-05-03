@@ -24,7 +24,6 @@ export class UsersService {
 
       return users.map((user) => ({
         ...user,
-        ip: user.ip?.toString(),
         firstlogin: user.firstlogin?.toString(),
         lastlogin: user.lastlogin?.toString(),
       }));

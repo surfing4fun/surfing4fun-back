@@ -11,7 +11,7 @@ import {
   Req,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Public } from 'src/decorators/Public';
+import { Public } from 'src/decorators/Public.decorator';
 import { ApiTags } from '@nestjs/swagger';
 
 import { UsersService } from '../../core/users/users.service';

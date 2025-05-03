@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Method } from 'axios';
-import { ALLOW_PERMISSIONS } from 'src/decorators/AllowPermissions';
+import { ALLOW_PERMISSIONS } from 'src/decorators/AllowPermissions.decorator';
 import { normalizePermissions } from 'src/utils/normalizePermissions';
 
 import { IAuthenticatedUser } from '../dto/authenticate-user.dto';

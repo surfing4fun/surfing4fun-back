@@ -1,5 +1,5 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { Public } from 'src/decorators/Public';
+import { Public } from 'src/decorators/Public.decorator';
 
 import { MaptiersService } from './maptiers.service';
 

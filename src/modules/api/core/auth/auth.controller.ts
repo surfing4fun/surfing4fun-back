@@ -8,7 +8,7 @@ import {
   Response,
   UseGuards,
 } from '@nestjs/common';
-import { Public } from 'src/decorators/Public';
+import { Public } from 'src/decorators/Public.decorator';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { normalizePermissions } from 'src/utils/normalizePermissions';
 import { AuthGuard } from '@nestjs/passport';

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DashboardPrismaService } from 'src/modules/shared/prisma/dashboard.service';
-import { Public } from 'src/decorators/Public';
+import { Public } from 'src/decorators/Public.decorator';
 
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';

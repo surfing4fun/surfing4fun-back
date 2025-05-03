@@ -3,15 +3,17 @@ import { RouterModule } from '@nestjs/core';
 
 import { MaptiersModule } from './maptiers/maptiers.module';
 import { UsersModule } from './users/users.module';
+import { ServerStatusModule } from './server-status/server-status.module';
 
 @Module({
   imports: [
     MaptiersModule,
     UsersModule,
+    ServerStatusModule,
     RouterModule.register([
       {
         path: 'surf',
-        children: [MaptiersModule, UsersModule],
+        children: [MaptiersModule, UsersModule, ServerStatusModule],
       },
     ]),
   ],
