@@ -45,5 +45,5 @@ jobs:
             yarn install --frozen-lockfile
             yarn db:generate
             yarn build
-            pm2 reload dashboard-api --update-env || pm2 start dist/master.js --name dashboard-api
+            pm2 restart dashboard-api --update-env
           EOF
