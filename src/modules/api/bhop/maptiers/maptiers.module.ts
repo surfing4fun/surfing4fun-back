@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { BhopPrismaService } from 'src/modules/shared/prisma/bhop.service';
 
-import { MaptiersService } from './maptiers.service';
 import { MaptiersController } from './maptiers.controller';
+import { MaptiersService } from './maptiers.service';
 
 @Module({
   providers: [MaptiersService, BhopPrismaService],

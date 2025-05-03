@@ -1,5 +1,5 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import * as cheerio from 'cheerio';
 import { firstValueFrom } from 'rxjs';
 

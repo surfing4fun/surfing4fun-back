@@ -8,14 +8,13 @@ import {
   Delete,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { SseService } from 'src/modules/shared/sse/sse.service';
 import { AllowPermissions } from 'src/decorators/AllowPermissions.decorator';
+import { SseService } from 'src/modules/shared/sse/sse.service';
 
-import { RolesService } from '../roles/roles.service';
-import { EPermission } from '../permissions/entities/permission.entity';
-
-import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UsersService } from './users.service';
+import { EPermission } from '../permissions/entities/permission.entity';
+import { RolesService } from '../roles/roles.service';
 
 @ApiTags('users')
 @ApiBearerAuth()

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import dayjs from 'dayjs';
 
-import { BhopPrismaService } from '../../../shared/prisma/bhop.service';
 import { MeasureRequestDuration } from '../../../../decorators/MeasureRequestDuration.decorator';
+import { BhopPrismaService } from '../../../shared/prisma/bhop.service';
 
 @Injectable()
 export class ServerStatusService {

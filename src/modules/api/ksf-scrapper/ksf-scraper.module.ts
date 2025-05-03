@@ -1,9 +1,9 @@
 // src/scraper/scraper.module.ts
-import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
+import { Module } from '@nestjs/common';
 
-import { KsfScraperService } from './ksf-scrapper.service';
 import { KsfScraperController } from './ksf-scraper.controller';
+import { KsfScraperService } from './ksf-scrapper.service';
 
 @Module({
   imports: [HttpModule],

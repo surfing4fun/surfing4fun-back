@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
 import { BhopPrismaService } from 'src/modules/shared/prisma/bhop.service';
 
-import { SteamModule } from '../../steam/steam.module';
-import { CountryFlagModule } from '../../country-flag/country-flag.module';
-
 import { RecentTimesController } from './recent-times.controller';
 import { RecentTimesService } from './recent-times.service';
+import { CountryFlagModule } from '../../country-flag/country-flag.module';
+import { SteamModule } from '../../steam/steam.module';
 
 @Module({
   controllers: [RecentTimesController],

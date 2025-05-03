@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { MeasureRequestDuration } from 'src/decorators/MeasureRequestDuration.decorator';
 
 import { BhopPrismaService } from '../../../shared/prisma/bhop.service';
+import { CountryFlagService } from '../../country-flag/country-flag.service';
+import { SteamService } from '../../steam/steam.service';
 import { Style } from '../constants/styles.enum';
 import { Track } from '../constants/tracks.enum';
-import { SteamService } from '../../steam/steam.service';
-import { CountryFlagService } from '../../country-flag/country-flag.service';
 
 @Injectable()
 export class RecentRecordsService {

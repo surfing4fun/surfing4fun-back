@@ -53,15 +53,7 @@ module.exports = {
       },
     ],
     'unused-imports/no-unused-imports': 'error',
-    'sort-imports': [
-      'error',
-      {
-        ignoreCase: false,
-        ignoreDeclarationSort: true,
-        ignoreMemberSort: true,
-        allowSeparatedGroups: true,
-      },
-    ],
+    'sort-imports': 'off',
     'import/order': [
       'error',
       {
@@ -69,11 +61,20 @@ module.exports = {
           'builtin',
           'external',
           'internal',
-          'parent',
-          'sibling',
-          'index',
+          ['parent', 'sibling', 'index'],
         ],
-        'newlines-between': 'always',
+        pathGroups: [
+          {
+            pattern: '**',
+            group: 'parent',
+            position: 'before',
+          },
+        ],
+        pathGroupsExcludedImportTypes: ['builtin'],
+        alphabetize: {
+          order: 'asc',
+          caseInsensitive: true,
+        },
       },
     ],
   },

@@ -1,11 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaModule } from 'src/modules/shared/prisma/prisma.module';
 
-import { RolesModule } from '../roles/roles.module';
-
+import { CreateUserDto } from './dto/create-user.dto';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { RolesModule } from '../roles/roles.module';
 
 describe('UsersController', () => {
   let controller: UsersController;

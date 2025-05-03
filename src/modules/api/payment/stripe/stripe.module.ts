@@ -1,13 +1,12 @@
 import { Module } from '@nestjs/common';
 import { EventsModule } from 'src/modules/shared/events/events.module';
 
-import { PaymentService } from '../payment.service';
-import { UsersService } from '../../core/users/users.service';
-import { AuthModule } from '../../core/auth/auth.module';
-
+import { StripeWebhooksService } from './stripe-webhooks.service';
 import { StripeController } from './stripe.controller';
 import { StripeService } from './stripe.service';
-import { StripeWebhooksService } from './stripe-webhooks.service';
+import { AuthModule } from '../../core/auth/auth.module';
+import { UsersService } from '../../core/users/users.service';
+import { PaymentService } from '../payment.service';
 
 @Module({
   providers: [

@@ -1,14 +1,14 @@
 import { Controller, Get } from '@nestjs/common';
-import { Public } from 'src/decorators/Public.decorator';
 import {
   ApiInternalServerErrorResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { Public } from 'src/decorators/Public.decorator';
 
-import { ServerHealthService } from './server-health.service';
 import { ServerHealthResponseDto } from './dto/server-health-responses.dto';
+import { ServerHealthService } from './server-health.service';
 
 @Public()
 @ApiTags('server-health')
