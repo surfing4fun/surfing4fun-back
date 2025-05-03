@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 
-import { SurfPrismaService } from '../../shared/prisma/surf.service';
+import { BhopPrismaService } from '../../../shared/prisma/bhop.service';
 
 @Injectable()
 export class MaptiersService {
-  constructor(private readonly prisma: SurfPrismaService) {}
+  constructor(private readonly prisma: BhopPrismaService) {}
 
   async getMaptiers(map?: string) {
     try {
@@ -15,16 +15,14 @@ export class MaptiersService {
         select: {
           map: true,
           tier: true,
-          maxvelocity: true,
-          autobhop_enabled: true,
+          possible_on_400vel: true,
+          possible_on_scroll: true,
+          possible_on_stamina: true,
           map_type: true,
         },
       });
 
-      return maptiers.map((maptier) => ({
-        ...maptier,
-        maxvelocity: maptier.maxvelocity?.toString(),
-      }));
+      return maptiers;
     } catch (error) {
       throw new Error(`Failed to fetch maptiers: ${error.message}`);
     }

@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
-import { MaptiersModule } from './maptiers/maptiers.module';
+
+import { SurfModule } from './surf/surf.module';
+import { BhopModule } from './bhop/bhop.module';
 
 @Module({
-  imports: [MaptiersModule],
+  imports: [SurfModule, BhopModule],
 })
-export class ApiModule {} 
+export class ApiModule {}

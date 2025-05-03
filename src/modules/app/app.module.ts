@@ -16,7 +16,8 @@ import { UsersModule } from '../api/core/users/users.module';
 import { RolesModule } from '../api/core/roles/roles.module';
 import { PermissionsModule } from '../api/core/permissions/permissions.module';
 import { PermissionRolesModule } from '../api/core/permission-roles/permission-roles.module';
-import { MaptiersModule } from '../api/maptiers/maptiers.module';
+import { SurfModule } from '../api/surf/surf.module';
+import { BhopModule } from '../api/bhop/bhop.module';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -41,7 +42,8 @@ import { AppService } from './app.service';
     EventsModule,
     KsfScraperModule,
     ServerHealthModule,
-    MaptiersModule,
+    SurfModule,
+    BhopModule,
   ],
   controllers: [AppController],
   providers: [AppService],
