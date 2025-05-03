@@ -92,6 +92,7 @@ export class KsfScraperService {
       .toArray();
 
     const mapRecords: any[] = [];
+    const stageRecords: Record<number, any[]> = {};
     const bonusesRecords: Record<string, any[]> = {};
 
     for (const opt of options) {
@@ -110,18 +111,26 @@ export class KsfScraperService {
         if (!top10.length) continue;
 
         const records = fullList ? top10 : [top10[0]];
+
         if (value === '0') {
           mapRecords.push(...records);
+        } else if (label.toLowerCase().includes('stage')) {
+          const stageNumber = parseInt(label.replace(/\D/g, ''), 10);
+          if (!isNaN(stageNumber)) {
+            stageRecords[stageNumber] = records;
+          }
         } else {
           const bonusNumber = parseInt(label.replace(/\D/g, ''), 10);
-          bonusesRecords[bonusNumber] = records;
+          if (!isNaN(bonusNumber)) {
+            bonusesRecords[bonusNumber] = records;
+          }
         }
       } catch {
         // ignore individual option errors
       }
     }
 
-    return { mapRecords, bonusesRecords };
+    return { mapRecords, stageRecords, bonusesRecords };
   }
 
   async getMap(mapName: string, fullList = false) {
