@@ -12,12 +12,12 @@ import { PermissionsModule } from '../api/core/permissions/permissions.module';
 import { RolesModule } from '../api/core/roles/roles.module';
 import { UsersModule } from '../api/core/users/users.module';
 import { HealthModule } from '../api/health/health.module';
-import { PaymentModule } from '../api/payment/payment.module';
-import { EventsModule } from '../shared/events/events.module';
-import { StripeModule } from '../api/payment/stripe/stripe.module';
 import { KsfScraperModule } from '../api/ksf-scrapper/ksf-scraper.module';
+import { PaymentModule } from '../api/payment/payment.module';
+import { StripeModule } from '../api/payment/stripe/stripe.module';
 import { ServerHealthModule } from '../api/server-health/server-health.module';
 import { SurfModule } from '../api/surf/surf.module';
+import { EventsModule } from '../shared/events/events.module';
 import { PrismaModule } from '../shared/prisma/prisma.module';
 import { SseModule } from '../shared/sse/sse.module';
 
