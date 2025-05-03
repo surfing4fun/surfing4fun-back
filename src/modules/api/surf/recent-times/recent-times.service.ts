@@ -19,14 +19,28 @@ export class RecentTimesService {
   async getRecentTimes({
     page = 1,
     pageSize = 10,
+    map,
+    style,
+    track,
   }: {
     page: number;
     pageSize: number;
+    map?: string;
+    style?: number;
+    track?: number;
   }) {
     const skip = (page - 1) * pageSize;
 
-    const times = await this.prisma.$queryRaw<any[]>`
-      SELECT
+    const whereClauses = [];
+    if (map) whereClauses.push(`pt.map = '${map}'`);
+    if (typeof style === 'number') whereClauses.push(`pt.style = ${style}`);
+    if (typeof track === 'number') whereClauses.push(`pt.track = ${track}`);
+    const whereSQL = whereClauses.length
+      ? 'WHERE ' + whereClauses.join(' AND ')
+      : '';
+
+    const times = await this.prisma.$queryRawUnsafe<any[]>(
+      `SELECT
         pt.id,
         pt.auth,
         pt.map,
@@ -47,17 +61,20 @@ export class RecentTimesService {
       FROM playertimes pt
       LEFT JOIN users u ON pt.auth = u.auth
       LEFT JOIN maptiers mt ON pt.map = mt.map
+      ${whereSQL}
       ORDER BY pt.date DESC
-      LIMIT ${pageSize} OFFSET ${skip}
-    `;
+      LIMIT ${pageSize} OFFSET ${skip}`,
+    );
 
-    const totalResult = await this.prisma.$queryRaw<any[]>`
-      SELECT COUNT(*) as count FROM playertimes
-    `;
+    const totalResult = await this.prisma.$queryRawUnsafe<any[]>(
+      `SELECT COUNT(*) as count FROM playertimes pt ${whereSQL}`,
+    );
     const total = totalResult[0]?.count || 0;
 
     const playerSummaries = await Promise.all(
-      times.map((time) => this.steamService.getPlayerSummary(time.auth)),
+      times.map((time) =>
+        this.steamService.getPlayerSummary(String(time.auth)),
+      ),
     );
 
     const data = await Promise.all(

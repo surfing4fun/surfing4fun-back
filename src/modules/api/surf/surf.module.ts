@@ -4,7 +4,6 @@ import { RouterModule } from '@nestjs/core';
 import { MaptiersModule } from './maptiers/maptiers.module';
 import { UsersModule } from './users/users.module';
 import { ServerStatusModule } from './server-status/server-status.module';
-import { RecentRecordsModule } from './recent-records/recent-records.module';
 import { RecentTimesModule } from './recent-times/recent-times.module';
 
 @Module({
@@ -12,7 +11,6 @@ import { RecentTimesModule } from './recent-times/recent-times.module';
     MaptiersModule,
     UsersModule,
     ServerStatusModule,
-    RecentRecordsModule,
     RecentTimesModule,
     RouterModule.register([
       {
@@ -21,7 +19,6 @@ import { RecentTimesModule } from './recent-times/recent-times.module';
           MaptiersModule,
           UsersModule,
           ServerStatusModule,
-          RecentRecordsModule,
           RecentTimesModule,
         ],
       },
