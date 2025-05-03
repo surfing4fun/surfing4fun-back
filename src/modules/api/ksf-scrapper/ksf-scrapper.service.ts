@@ -147,7 +147,7 @@ export class KsfScraperService {
       const styleData: any = {};
       for (const [style, styleParam] of Object.entries(styles)) {
         styleData[style] = await this.scrapeMap(
-          styleParam ? `${baseUrl}?style=${styleParam}` : baseUrl,
+          styleParam ? `${baseUrl}?mode=${styleParam}` : baseUrl,
           mapName,
           styleParam,
           fullList,
