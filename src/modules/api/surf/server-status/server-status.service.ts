@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import dayjs from 'dayjs';
+import { MeasureRequestDuration } from 'src/decorators/MeasureRequestDuration.decorator';
 
 import { SurfPrismaService } from '../../../shared/prisma/surf.service';
-import { MeasureRequestDuration } from '../../../../decorators/MeasureRequestDuration.decorator';
 
 @Injectable()
 export class ServerStatusService {
@@ -57,14 +57,10 @@ export class ServerStatusService {
         }),
       ]);
 
-      const totalPlaytimeInHours = totalPlaytime._sum.playtime
-        ? Math.floor(totalPlaytime._sum.playtime / (60 * 60))
-        : 0;
-
       return {
         playerCount,
         runCount,
-        totalPlaytime: totalPlaytimeInHours,
+        totalPlaytime: totalPlaytime,
         mapCount,
         runsToday,
         runsLast24Hours,

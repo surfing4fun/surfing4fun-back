@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { MeasureRequestDuration } from 'src/decorators/MeasureRequestDuration.decorator';
 
 import { SurfPrismaService } from '../../../shared/prisma/surf.service';
 
@@ -6,6 +7,7 @@ import { SurfPrismaService } from '../../../shared/prisma/surf.service';
 export class UsersService {
   constructor(private readonly prisma: SurfPrismaService) {}
 
+  @MeasureRequestDuration()
   async getUsers(auth?: number) {
     try {
       const where = auth ? { auth } : {};
@@ -19,10 +21,12 @@ export class UsersService {
           lastlogin: true,
           points: true,
           playtime: true,
+          ip: true,
         },
       });
 
-      return users.map((user) => ({
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      return users.map(({ ip, ...user }) => ({
         ...user,
         firstlogin: user.firstlogin?.toString(),
         lastlogin: user.lastlogin?.toString(),

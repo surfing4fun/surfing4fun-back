@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { MeasureRequestDuration } from 'src/decorators/MeasureRequestDuration.decorator';
 
 import { SurfPrismaService } from '../../../shared/prisma/surf.service';
 
@@ -6,7 +7,8 @@ import { SurfPrismaService } from '../../../shared/prisma/surf.service';
 export class MaptiersService {
   constructor(private readonly prisma: SurfPrismaService) {}
 
-  async getMaptiers(map?: string) {
+  @MeasureRequestDuration()
+  async getMaptiers({ map }: { map?: string } = {}) {
     try {
       const where = map ? { map } : {};
 

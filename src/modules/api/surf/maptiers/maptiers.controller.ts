@@ -15,6 +15,6 @@ export class MaptiersController {
 
   @Get(':map')
   async getMaptierByMap(@Param('map') map: string) {
-    return this.maptiersService.getMaptiers(map);
+    return this.maptiersService.getMaptiers({ map });
   }
 }

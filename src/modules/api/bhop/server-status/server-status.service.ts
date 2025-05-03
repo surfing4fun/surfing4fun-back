@@ -57,14 +57,10 @@ export class ServerStatusService {
         }),
       ]);
 
-      const totalPlaytimeInHours = totalPlaytime._sum.playtime
-        ? Math.floor(totalPlaytime._sum.playtime / (60 * 60))
-        : 0;
-
       return {
         playerCount,
         runCount,
-        totalPlaytime: totalPlaytimeInHours,
+        totalPlaytime: totalPlaytime,
         mapCount,
         runsToday,
         runsLast24Hours,
