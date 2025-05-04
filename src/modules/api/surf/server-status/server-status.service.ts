@@ -60,7 +60,7 @@ export class ServerStatusService {
       return {
         playerCount,
         runCount,
-        totalPlaytime: totalPlaytime,
+        totalPlaytime: totalPlaytime._sum.playtime,
         mapCount,
         runsToday,
         runsLast24Hours,
