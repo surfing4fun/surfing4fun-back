@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { PaginatorService } from 'src/modules/helpers/services/paginator.service';
+import {
+  IPrismaQueryable,
+  PaginatorService,
+} from 'src/modules/helpers/services/paginator.service';
 
 import { BhopRecentTimeDto } from './dto/recent-time.dto';
 import { BhopRecentTimesQueryDto } from './dto/recent-times-query.dto';
@@ -10,6 +13,7 @@ import { CountryFlagService } from '../../country-flag/country-flag.service';
 import { SteamService } from '../../steam/steam.service';
 import { Style } from '../constants/styles.enum';
 import { Track } from '../constants/tracks.enum';
+
 @Injectable()
 export class RecentTimesService {
   constructor(
@@ -23,12 +27,14 @@ export class RecentTimesService {
     query: BhopRecentTimesQueryDto,
   ): Promise<BhopRecentTimesResponseDto> {
     const { page, pageSize, map, style, track } = query;
+    const pageNum = Math.max(1, Number(page));
+    const pageSizeNum = Math.max(1, Number(pageSize));
 
     const clauses: string[] = [];
     if (map) clauses.push(`pt.map = '${map}'`);
     if (typeof style === 'number') clauses.push(`pt.style = ${style}`);
     if (typeof track === 'number') clauses.push(`pt.track = ${track}`);
-    const whereSQL = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
+    const whereSql = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
 
     const baseQuery = `
       SELECT
@@ -54,24 +60,18 @@ export class RecentTimesService {
       FROM playertimes pt
       LEFT JOIN users u     ON pt.auth = u.auth
       LEFT JOIN maptiers mt ON pt.map = mt.map
-      ${whereSQL}
+      ${whereSql}
       ORDER BY pt.date DESC
     `;
 
-    const paged = await this.paginator.paginate(
-      ({ skip, take }) =>
-        this.prisma.$queryRawUnsafe<any[]>(
-          `${baseQuery} LIMIT ${take} OFFSET ${skip}`,
-        ),
-      () =>
-        this.prisma
-          .$queryRawUnsafe<
-            { count: bigint }[]
-          >(`SELECT COUNT(*) AS count FROM playertimes pt ${whereSQL}`)
-          .then((r) => Number(r[0]?.count ?? 0)),
-      page,
-      pageSize,
-      (page) => `/recent-times?page=${page}&pageSize=${query.pageSize}`,
+    const paged = await this.paginator.paginateSqlAutoCount<any>(
+      this.prisma as unknown as IPrismaQueryable,
+      baseQuery,
+      'playertimes pt',
+      whereSql,
+      pageNum,
+      pageSizeNum,
+      (p) => `/recent-times?page=${p}&pageSize=${pageSizeNum}`,
     );
 
     const summaries = await Promise.all(
@@ -107,7 +107,7 @@ export class RecentTimesService {
         dto.playerLocationCountry = country;
         dto.playerLocationCountryFlag = flag;
         dto.points = time.points;
-        dto.rank = (page - 1) * pageSize + i + 1;
+        dto.rank = (paged.meta.page - 1) * paged.meta.pageSize + i + 1;
         dto.runTime = time.time;
         dto.runTimeDifference = runTimeDiff;
         dto.style = Style[time.style];
@@ -117,6 +117,10 @@ export class RecentTimesService {
       }),
     );
 
-    return { data, meta: paged.meta, links: paged.links };
+    return {
+      data,
+      meta: paged.meta,
+      links: paged.links,
+    };
   }
 }

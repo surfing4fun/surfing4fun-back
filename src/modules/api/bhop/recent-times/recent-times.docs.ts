@@ -27,7 +27,7 @@ export function getRecentTimesDocs() {
     ApiQuery({
       name: 'style',
       required: false,
-      description: 'Filter by surf style',
+      description: 'Filter by bhop style',
       type: String,
     }),
     ApiQuery({
@@ -39,7 +39,7 @@ export function getRecentTimesDocs() {
     ApiResponse({
       status: 200,
       description:
-        'Returns a list of recent surf times with pagination metadata',
+        'Returns a list of recent bhop times with pagination metadata',
       type: BhopRecentTimesResponseDto,
     }),
   );
