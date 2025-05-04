@@ -53,7 +53,6 @@ module.exports = {
       },
     ],
     'unused-imports/no-unused-imports': 'error',
-    'sort-imports': 'off',
     'import/order': [
       'error',
       {
@@ -63,19 +62,13 @@ module.exports = {
           'internal',
           ['parent', 'sibling', 'index'],
         ],
-        pathGroups: [
-          {
-            pattern: '**',
-            group: 'parent',
-            position: 'before',
-          },
-        ],
-        pathGroupsExcludedImportTypes: ['builtin'],
+        'newlines-between': 'always',
         alphabetize: {
           order: 'asc',
           caseInsensitive: true,
         },
       },
     ],
+    'sort-imports': 'off',
   },
 };

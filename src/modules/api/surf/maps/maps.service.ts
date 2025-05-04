@@ -4,15 +4,15 @@ import { MeasureRequestDuration } from 'src/decorators/MeasureRequestDuration.de
 import { SurfPrismaService } from '../../../shared/prisma/surf.service';
 
 @Injectable()
-export class MaptiersService {
+export class MapsService {
   constructor(private readonly prisma: SurfPrismaService) {}
 
   @MeasureRequestDuration()
-  async getMaptiers({ map }: { map?: string } = {}) {
+  async getMaps({ map }: { map?: string } = {}) {
     try {
       const where = map ? { map } : {};
 
-      const maptiers = await this.prisma.maptiers.findMany({
+      const maps = await this.prisma.maptiers.findMany({
         where,
         select: {
           map: true,
@@ -23,12 +23,12 @@ export class MaptiersService {
         },
       });
 
-      return maptiers.map((maptier) => ({
+      return maps.map((maptier) => ({
         ...maptier,
         maxvelocity: maptier.maxvelocity?.toString(),
       }));
     } catch (error) {
-      throw new Error(`Failed to fetch maptiers: ${error.message}`);
+      throw new Error(`Failed to fetch maps: ${error.message}`);
     }
   }
 }

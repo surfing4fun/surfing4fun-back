@@ -1,8 +1,8 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/decorators/Public.decorator';
-import { getAllUsersDocs, getUserByAuthDocs } from './users.docs';
 
+import { getAllUsersDocs, getUserByAuthDocs } from './users.docs';
 import { UsersService } from './users.service';
 
 @ApiTags('Surf')
