@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { PaginationLinksResponseDto } from 'src/modules/helpers/dto/pagination-links-response.dto';
 import { PaginationMetaResponseDto } from 'src/modules/helpers/dto/pagination-meta-response.dto';
 import {
+  IPrismaQueryable,
   PaginatorService,
-  PrismaQueryable,
 } from 'src/modules/helpers/services/paginator.service';
 
 import { SurfRecentRecordDto } from './dto/recent-record.dto';
@@ -65,7 +65,7 @@ export class RecentRecordsService {
     `;
 
     const paged = await this.paginator.paginateSqlAutoCount<any>(
-      this.prisma as unknown as PrismaQueryable,
+      this.prisma as unknown as IPrismaQueryable,
       baseSql,
       'playertimes pt',
       whereSql,
@@ -78,41 +78,45 @@ export class RecentRecordsService {
       paged.data.map((r) => this.steamService.getPlayerSummary(String(r.auth))),
     );
 
-    const data: SurfRecentRecordDto[] = paged.data.map((record, idx) => {
-      const secondTime = (record as any).second_best_time as number | null;
-      const runTimeDiff = secondTime != null ? record.time - secondTime : null;
+    const data: SurfRecentRecordDto[] = await Promise.all(
+      paged.data.map(async (record, idx) => {
+        const secondTime = (record as any).second_best_time as number | null;
+        const runTimeDiff =
+          secondTime != null ? record.time - secondTime : null;
 
-      let country: string | null = null;
-      let flag: string | null = null;
-      try {
-        country = this.countryFlagService.getCountryCodeByLongIp(
-          record.user_ip,
-        );
-        flag = this.countryFlagService.getCountryFlagByCountryCode(country);
-      } catch {
-        // ignore
-      }
+        let country: string | null = null;
+        let flag: string | null = null;
+        try {
+          country = await this.countryFlagService.getCountryCodeByLongIp(
+            record.user_ip,
+          );
+          flag =
+            await this.countryFlagService.getCountryFlagByCountryCode(country);
+        } catch {
+          // ignore
+        }
 
-      const sum = summaries[idx];
-      return {
-        date: record.date,
-        map: record.map,
-        mapType: record.map_type,
-        player: record.user_auth ?? record.auth,
-        playerNickname: sum?.nickname ?? null,
-        playerProfileUrl: sum?.profileUrl ?? null,
-        playerAvatar: sum?.avatar ?? null,
-        playerLocationCountry: country,
-        playerLocationCountryFlag: flag,
-        points: record.points,
-        rank: (paged.meta.page - 1) * paged.meta.pageSize + idx + 1,
-        runTime: record.time,
-        runTimeDifference: runTimeDiff,
-        style: Style[record.style],
-        tier: record.tier,
-        track: Track[record.track],
-      };
-    });
+        const sum = summaries[idx];
+        return {
+          date: record.date,
+          map: record.map,
+          mapType: record.map_type,
+          player: record.user_auth ?? record.auth,
+          playerNickname: sum?.nickname ?? null,
+          playerProfileUrl: sum?.profileUrl ?? null,
+          playerAvatar: sum?.avatar ?? null,
+          playerLocationCountry: country,
+          playerLocationCountryFlag: flag,
+          points: record.points,
+          rank: (paged.meta.page - 1) * paged.meta.pageSize + idx + 1,
+          runTime: record.time,
+          runTimeDifference: runTimeDiff,
+          style: Style[record.style],
+          tier: record.tier,
+          track: Track[record.track],
+        };
+      }),
+    );
 
     return {
       data,
