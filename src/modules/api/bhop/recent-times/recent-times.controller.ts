@@ -1,17 +1,21 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/decorators/Public.decorator';
 
-import { getRecentTimesDocs } from './recent-times.docs';
+import {
+  GetRecentTimesApiOperation,
+  GetRecentTimesApiResponse,
+  RecentTimesApiTags,
+} from './recent-times.docs';
 import { RecentTimesService } from './recent-times.service';
 
-@ApiTags('Bhop')
+@RecentTimesApiTags()
 @Public()
 @Controller('recent-times')
 export class RecentTimesController {
   constructor(private readonly recentTimesService: RecentTimesService) {}
 
-  @getRecentTimesDocs()
+  @GetRecentTimesApiOperation()
+  @GetRecentTimesApiResponse()
   @Get()
   async getRecentTimes(
     @Query('page') page: string = '1',

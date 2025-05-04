@@ -4,15 +4,15 @@ import { MeasureRequestDuration } from 'src/decorators/MeasureRequestDuration.de
 import { BhopPrismaService } from '../../../shared/prisma/bhop.service';
 
 @Injectable()
-export class MaptiersService {
+export class MapsService {
   constructor(private readonly prisma: BhopPrismaService) {}
 
   @MeasureRequestDuration()
-  async getMaptiers(map?: string) {
+  async getMaps(map?: string) {
     try {
       const where = map ? { map } : {};
 
-      const maptiers = await this.prisma.maptiers.findMany({
+      const maps = await this.prisma.maptiers.findMany({
         where,
         select: {
           map: true,
@@ -24,9 +24,9 @@ export class MaptiersService {
         },
       });
 
-      return maptiers;
+      return maps;
     } catch (error) {
-      throw new Error(`Failed to fetch maptiers: ${error.message}`);
+      throw new Error(`Failed to fetch maps: ${error.message}`);
     }
   }
 }

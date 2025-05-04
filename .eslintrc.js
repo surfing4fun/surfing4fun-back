@@ -1,3 +1,4 @@
+// .eslintrc.js
 module.exports = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -57,10 +58,12 @@ module.exports = {
       'error',
       {
         groups: [
-          'builtin',
-          'external',
-          'internal',
-          ['parent', 'sibling', 'index'],
+          'builtin', // Node.js core modules: fs, path, etc.
+          'external', // Third-party modules: lodash, express, etc.
+          'internal', // Absolute imports or project aliases
+          'index', // `import foo from './'`
+          'sibling', // `import foo from './foo'`
+          'parent', // `import foo from '../foo'`
         ],
         'newlines-between': 'always',
         alphabetize: {

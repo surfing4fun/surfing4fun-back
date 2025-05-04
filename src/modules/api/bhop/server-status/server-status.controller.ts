@@ -1,20 +1,21 @@
 import { Controller, Get } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/decorators/Public.decorator';
 
+import {
+  GetServerStatusApiOperation,
+  GetServerStatusApiResponse,
+  ServerStatusApiTags,
+} from './server-status.docs';
 import { ServerStatusService } from './server-status.service';
 
-@ApiTags('Bhop')
+@ServerStatusApiTags()
 @Public()
 @Controller('server-status')
 export class ServerStatusController {
   constructor(private readonly serverStatusService: ServerStatusService) {}
 
-  @ApiOperation({ summary: 'Get bhop server status' })
-  @ApiResponse({
-    status: 200,
-    description: 'Returns the current status of the bhop server',
-  })
+  @GetServerStatusApiOperation()
+  @GetServerStatusApiResponse()
   @Get()
   async getServerStatus() {
     return this.serverStatusService.getServerStatus();

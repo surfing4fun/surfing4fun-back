@@ -1,50 +1,21 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/decorators/Public.decorator';
 
+import {
+  GetRecentRecordsApiOperation,
+  GetRecentRecordsApiResponse,
+  RecentRecordsApiTags,
+} from './recent-records.docs';
 import { RecentRecordsService } from './recent-records.service';
 
-@ApiTags('Bhop')
+@RecentRecordsApiTags()
 @Public()
 @Controller('recent-records')
 export class RecentRecordsController {
   constructor(private readonly recentRecordsService: RecentRecordsService) {}
 
-  @ApiOperation({ summary: 'Get recent bhop records' })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    description: 'Page number',
-    type: String,
-  })
-  @ApiQuery({
-    name: 'pageSize',
-    required: false,
-    description: 'Items per page',
-    type: String,
-  })
-  @ApiQuery({
-    name: 'map',
-    required: false,
-    description: 'Filter by map name',
-    type: String,
-  })
-  @ApiQuery({
-    name: 'style',
-    required: false,
-    description: 'Filter by bhop style',
-    type: String,
-  })
-  @ApiQuery({
-    name: 'track',
-    required: false,
-    description: 'Filter by track number',
-    type: String,
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Returns a list of recent bhop records',
-  })
+  @GetRecentRecordsApiOperation()
+  @GetRecentRecordsApiResponse()
   @Get()
   async getRecentRecords(
     @Query('page') page: string = '1',
