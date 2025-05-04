@@ -1,50 +1,17 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/decorators/Public.decorator';
+import { getRecentTimesDocs } from './recent-times.docs';
 
 import { RecentTimesService } from './recent-times.service';
 
-@ApiTags('Surf - Recent Times')
+@ApiTags('Surf')
 @Public()
 @Controller('recent-times')
 export class RecentTimesController {
   constructor(private readonly recentTimesService: RecentTimesService) {}
 
-  @ApiOperation({ summary: 'Get recent surf times' })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    description: 'Page number',
-    type: String,
-  })
-  @ApiQuery({
-    name: 'pageSize',
-    required: false,
-    description: 'Items per page',
-    type: String,
-  })
-  @ApiQuery({
-    name: 'map',
-    required: false,
-    description: 'Filter by map name',
-    type: String,
-  })
-  @ApiQuery({
-    name: 'style',
-    required: false,
-    description: 'Filter by surf style',
-    type: String,
-  })
-  @ApiQuery({
-    name: 'track',
-    required: false,
-    description: 'Filter by track number',
-    type: String,
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Returns a list of recent surf times',
-  })
+  @getRecentTimesDocs()
   @Get()
   async getRecentTimes(
     @Query('page') page: string = '1',
