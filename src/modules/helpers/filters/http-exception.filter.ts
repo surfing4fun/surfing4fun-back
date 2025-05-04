@@ -1,3 +1,4 @@
+// src/modules/helpers/filters/http-exception.filter.ts
 import {
   ExceptionFilter,
   Catch,
@@ -26,55 +27,37 @@ export class HttpErrorFilter implements ExceptionFilter {
       status = exception.getStatus();
       const res = exception.getResponse();
 
-      // Determine title and detail from response
+      // Determine title & detail
       if (typeof res === 'string') {
         detail = res;
         title = exception.name;
-      } else if (typeof res === 'object') {
+      } else {
         const err = res as any;
         detail = err.message ?? exception.message;
         title = err.error ?? exception.name;
 
-        // Extract field errors if present
+        // Extract field errors for validation failures
         if (Array.isArray(err.message)) {
           errors = (err.message as string[])
             .filter((msg) => typeof msg === 'string')
-            .map((msg) => ({ field: '', message: msg }));
+            .map((msg) => {
+              const [field, ...rest] = msg.split(' ');
+              return {
+                field,
+                message: rest.join(' '),
+              };
+            });
         }
       }
     } else {
-      // Non-HTTP exceptions
+      // Fallback for non-HTTP exceptions
       status = HttpStatus.INTERNAL_SERVER_ERROR;
       title = 'InternalServerError';
       detail = 'Internal server error';
     }
 
-    // Map status to RFC7807 type URI
-    switch (status) {
-      case HttpStatus.BAD_REQUEST:
-        type = 'https://httpstatuses.com/400';
-        break;
-      case HttpStatus.UNAUTHORIZED:
-        type = 'https://httpstatuses.com/401';
-        break;
-      case HttpStatus.FORBIDDEN:
-        type = 'https://httpstatuses.com/403';
-        break;
-      case HttpStatus.NOT_FOUND:
-        type = 'https://httpstatuses.com/404';
-        break;
-      case HttpStatus.CONFLICT:
-        type = 'https://httpstatuses.com/409';
-        break;
-      case HttpStatus.UNPROCESSABLE_ENTITY:
-        type = 'https://httpstatuses.com/422';
-        break;
-      case HttpStatus.TOO_MANY_REQUESTS:
-        type = 'https://httpstatuses.com/429';
-        break;
-      default:
-        type = 'https://httpstatuses.com/' + status;
-    }
+    // Map status code to official RFC7807 type URI
+    type = `https://httpstatuses.com/${status}`;
 
     const errorResponse: ErrorResponseDto = {
       type,
@@ -82,8 +65,8 @@ export class HttpErrorFilter implements ExceptionFilter {
       status,
       detail,
       instance: request.url,
-      timestamp: new Date().toISOString(),
       errors,
+      timestamp: new Date().toISOString(),
     };
 
     response.status(status).json(errorResponse);
