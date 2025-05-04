@@ -249,8 +249,8 @@ async function bootstrap() {
   app.useGlobalInterceptors(
     new WrapResponseInterceptor(),
     new ResponseTimeInterceptor(),
-    new PaginationHeadersInterceptor(),
     new CacheVersioningInterceptor(),
+    new PaginationHeadersInterceptor(),
   );
 
   // Global filters

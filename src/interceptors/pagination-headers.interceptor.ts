@@ -17,28 +17,29 @@ import { tap } from 'rxjs/operators';
 @Injectable()
 export class PaginationHeadersInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    const http = context.switchToHttp();
-    const response = http.getResponse<Response>();
+    const res = context.switchToHttp().getResponse<Response>();
 
-    response.header('Access-Control-Expose-Headers', 'X-Total-Count, Link');
+    // always expose these headers
+    if (!res.headersSent) {
+      res.header('Access-Control-Expose-Headers', 'X-Total-Count, Link');
+    }
 
     return next.handle().pipe(
       tap((body) => {
+        // never stomp on a committed response
+        if (res.headersSent) return;
+
         if (body?.meta?.total != null && body?.links) {
-          response.header('X-Total-Count', String(body.meta.total));
+          res.header('X-Total-Count', String(body.meta.total));
 
           const links: string[] = [];
           links.push(`<${body.links.first}>; rel="first"`);
-          if (body.links.prev) {
-            links.push(`<${body.links.prev}>; rel="prev"`);
-          }
+          if (body.links.prev) links.push(`<${body.links.prev}>; rel="prev"`);
           links.push(`<${body.links.self}>; rel="self"`);
-          if (body.links.next) {
-            links.push(`<${body.links.next}>; rel="next"`);
-          }
+          if (body.links.next) links.push(`<${body.links.next}>; rel="next"`);
           links.push(`<${body.links.last}>; rel="last"`);
 
-          response.header('Link', links.join(', '));
+          res.header('Link', links.join(', '));
         }
       }),
     );
