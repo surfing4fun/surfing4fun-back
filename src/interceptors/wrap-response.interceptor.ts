@@ -13,7 +13,6 @@ export class WrapResponseInterceptor implements NestInterceptor {
   intercept(_: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
       map((body) => {
-        // Only proceed if body.meta is an object and data is an array
         if (
           body &&
           typeof body === 'object' &&
@@ -21,15 +20,17 @@ export class WrapResponseInterceptor implements NestInterceptor {
           (body as any).meta &&
           typeof (body as any).meta === 'object'
         ) {
-          const { data, meta, durationMs } = body as any;
-          // Merge durationMs into meta if present
+          const { durationMs, ...rest } = body as any;
           const wrappedMeta = {
-            ...meta,
+            ...rest.meta,
             ...(typeof durationMs === 'number' ? { durationMs } : {}),
           };
-          return { data, meta: wrappedMeta };
+          // `rest` includes data, meta (old), links, etc.; we override meta
+          return {
+            ...rest,
+            meta: wrappedMeta,
+          };
         }
-        // Fallback: return untouched
         return body;
       }),
     );

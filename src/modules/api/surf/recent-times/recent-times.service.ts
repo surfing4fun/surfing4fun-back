@@ -118,6 +118,7 @@ export class RecentTimesService {
       }),
     );
 
+    console.log('PAGED RESULT:', paged);
     return { data, meta: paged.meta, links: paged.links };
   }
 }
