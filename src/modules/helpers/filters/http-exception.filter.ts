@@ -24,7 +24,6 @@ export class HttpErrorFilter implements ExceptionFilter {
     const req = ctx.getRequest<Request>();
 
     if (res.headersSent) {
-      this.logger.error('Headers already sent');
       return;
     }
 
