@@ -1,14 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import dayjs from 'dayjs';
 
-import { MeasureRequestDuration } from '../../../../decorators/MeasureRequestDuration.decorator';
 import { BhopPrismaService } from '../../../shared/prisma/bhop.service';
 
 @Injectable()
 export class ServerStatusService {
   constructor(private readonly prisma: BhopPrismaService) {}
 
-  @MeasureRequestDuration()
   async getServerStatus() {
     try {
       const now = dayjs();

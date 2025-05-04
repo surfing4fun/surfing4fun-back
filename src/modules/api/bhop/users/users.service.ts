@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { MeasureRequestDuration } from 'src/decorators/MeasureRequestDuration.decorator';
 
 import { BhopPrismaService } from '../../../shared/prisma/bhop.service';
 
@@ -7,7 +6,6 @@ import { BhopPrismaService } from '../../../shared/prisma/bhop.service';
 export class UsersService {
   constructor(private readonly prisma: BhopPrismaService) {}
 
-  @MeasureRequestDuration()
   async getUsers(auth?: number) {
     try {
       const where = auth ? { auth } : {};

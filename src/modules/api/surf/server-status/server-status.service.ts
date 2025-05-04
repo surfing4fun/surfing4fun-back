@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import dayjs from 'dayjs';
-import { MeasureRequestDuration } from 'src/decorators/MeasureRequestDuration.decorator';
 
 import { SurfPrismaService } from '../../../shared/prisma/surf.service';
 
@@ -8,7 +7,6 @@ import { SurfPrismaService } from '../../../shared/prisma/surf.service';
 export class ServerStatusService {
   constructor(private readonly prisma: SurfPrismaService) {}
 
-  @MeasureRequestDuration()
   async getServerStatus() {
     try {
       const now = dayjs();

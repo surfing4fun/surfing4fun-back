@@ -5,6 +5,8 @@ import cookieParser from 'cookie-parser';
 import session from 'express-session';
 
 import { validatorOptions } from './configs/validator-options';
+import { ResponseTimeInterceptor } from './interceptors/respone-time.interceptor';
+import { WrapResponseInterceptor } from './interceptors/wrap-response.interceptor';
 import { AppModule } from './modules/app/app.module';
 
 async function bootstrap() {
@@ -50,6 +52,12 @@ async function bootstrap() {
       resave: false,
       saveUninitialized: false,
     }),
+  );
+
+  // Measure duration of requests and wrap response
+  app.useGlobalInterceptors(
+    new WrapResponseInterceptor(),
+    new ResponseTimeInterceptor(),
   );
 
   await app.listen(process.env.API_PORT);

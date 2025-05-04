@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { MeasureRequestDuration } from 'src/decorators/MeasureRequestDuration.decorator';
 
 import { SurfPrismaService } from '../../../shared/prisma/surf.service';
 import { CountryFlagService } from '../../country-flag/country-flag.service';
@@ -15,7 +14,6 @@ export class RecentRecordsService {
     private readonly countryFlagService: CountryFlagService,
   ) {}
 
-  @MeasureRequestDuration()
   async getRecentRecords({
     page = 1,
     pageSize = 10,

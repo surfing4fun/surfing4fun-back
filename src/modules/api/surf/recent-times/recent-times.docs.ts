@@ -1,6 +1,8 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 
+import { RecentTimesResponseDto } from './dto/recent-times-response.dto';
+
 export function getRecentTimesDocs() {
   return applyDecorators(
     ApiOperation({ summary: 'Get recent surf times' }),
@@ -36,7 +38,9 @@ export function getRecentTimesDocs() {
     }),
     ApiResponse({
       status: 200,
-      description: 'Returns a list of recent surf times',
+      description:
+        'Returns a list of recent surf times with pagination metadata',
+      type: RecentTimesResponseDto,
     }),
   );
 }
