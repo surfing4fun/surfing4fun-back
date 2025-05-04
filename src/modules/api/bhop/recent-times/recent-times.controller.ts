@@ -2,10 +2,8 @@ import { Controller, Get, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/decorators/Public.decorator';
 
-import {
-  GetRecentTimesApiOperation,
-  GetRecentTimesApiResponse,
-} from './recent-times.docs';
+import { RecentTimesQueryDto } from './dto/recent-times-query.dto';
+import { getRecentTimesDocs } from './recent-times.docs';
 import { RecentTimesService } from './recent-times.service';
 
 @ApiTags('Bhop')
@@ -14,24 +12,9 @@ import { RecentTimesService } from './recent-times.service';
 export class RecentTimesController {
   constructor(private readonly recentTimesService: RecentTimesService) {}
 
-  @GetRecentTimesApiOperation()
-  @GetRecentTimesApiResponse()
+  @getRecentTimesDocs()
   @Get()
-  async getRecentTimes(
-    @Query('page') page: string = '1',
-    @Query('pageSize') pageSize: string = '10',
-    @Query('map') map?: string,
-    @Query('style') style?: string,
-    @Query('track') track?: string,
-  ) {
-    const pageNum = Math.max(1, parseInt(page, 10) || 1);
-    const pageSizeNum = Math.max(1, parseInt(pageSize, 10) || 10);
-    return this.recentTimesService.getRecentTimes({
-      page: pageNum,
-      pageSize: pageSizeNum,
-      map,
-      style: style !== undefined ? Number(style) : undefined,
-      track: track !== undefined ? Number(track) : undefined,
-    });
+  async getRecentTimes(@Query() query: RecentTimesQueryDto) {
+    return this.recentTimesService.getRecentTimes(query);
   }
 }

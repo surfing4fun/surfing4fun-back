@@ -1,50 +1,11 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 
-export const GetRecentTimesApiOperation = () =>
-  ApiOperation({
-    summary: 'Get recent bhop times',
-    description: 'Returns a list of recent bhop times from the database',
-  });
-
-export const GetRecentTimesApiResponse = () =>
-  ApiResponse({
-    status: 200,
-    description: 'List of recent bhop times',
-    schema: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          id: { type: 'number' },
-          playerId: { type: 'number' },
-          mapId: { type: 'number' },
-          time: { type: 'number' },
-          date: { type: 'string', format: 'date-time' },
-          player: {
-            type: 'object',
-            properties: {
-              id: { type: 'number' },
-              name: { type: 'string' },
-              steamId: { type: 'string' },
-            },
-          },
-          map: {
-            type: 'object',
-            properties: {
-              id: { type: 'number' },
-              name: { type: 'string' },
-              tier: { type: 'number' },
-            },
-          },
-        },
-      },
-    },
-  });
+import { RecentTimesResponseDto } from './dto/recent-times-response.dto';
 
 export function getRecentTimesDocs() {
   return applyDecorators(
-    ApiOperation({ summary: 'Get recent bhop times' }),
+    ApiOperation({ summary: 'Get recent surf times' }),
     ApiQuery({
       name: 'page',
       required: false,
@@ -66,7 +27,7 @@ export function getRecentTimesDocs() {
     ApiQuery({
       name: 'style',
       required: false,
-      description: 'Filter by bhop style',
+      description: 'Filter by surf style',
       type: String,
     }),
     ApiQuery({
@@ -77,7 +38,9 @@ export function getRecentTimesDocs() {
     }),
     ApiResponse({
       status: 200,
-      description: 'Returns a list of recent bhop times',
+      description:
+        'Returns a list of recent surf times with pagination metadata',
+      type: RecentTimesResponseDto,
     }),
   );
 }

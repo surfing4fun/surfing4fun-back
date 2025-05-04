@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { PaginatorService } from 'src/modules/helpers/services/paginator.service';
 import { BhopPrismaService } from 'src/modules/shared/prisma/bhop.service';
 
 import { RecentTimesController } from './recent-times.controller';
@@ -10,6 +11,6 @@ import { SteamModule } from '../../steam/steam.module';
 @Module({
   controllers: [RecentTimesController],
   imports: [SteamModule, CountryFlagModule],
-  providers: [RecentTimesService, BhopPrismaService],
+  providers: [RecentTimesService, BhopPrismaService, PaginatorService],
 })
 export class RecentTimesModule {}
