@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ErrorDetail {
-  @ApiProperty({ example: 'page', description: 'Field name with error' })
+  @ApiProperty({ example: 'pageSize', description: 'Field name with error' })
   field: string;
 
   @ApiProperty({
-    example: 'Page must be >= 1',
+    example: 'must not be greater than 100',
     description: 'Validation message',
   })
   message: string;
@@ -13,42 +13,42 @@ export class ErrorDetail {
 
 export class ErrorResponseDto {
   @ApiProperty({
-    example: 'https://httpstatuses.io/400',
-    description: 'A URI reference that identifies the problem type',
+    example: 'https://httpstatuses.com/401',
+    description: 'Error type URI',
   })
   type: string;
 
   @ApiProperty({
-    example: 'BadRequest',
-    description: 'Short, human-readable title of the error',
+    example: 'Unauthorized',
+    description: 'Short, human-readable title',
   })
   title: string;
 
-  @ApiProperty({ example: 400, description: 'HTTP status code' })
+  @ApiProperty({ example: 401, description: 'HTTP status code' })
   status: number;
 
   @ApiProperty({
-    example: "The 'page' parameter must be at least 1.",
-    description: 'Detailed description specific to this error occurrence',
+    example: 'Authentication credentials were missing or invalid',
+    description: 'Detailed error description',
   })
   detail: string;
 
   @ApiProperty({
-    example: '/surf/recent-times?page=0',
+    example: '/surf/recent-times?page=1&pageSize=1',
     description: 'Request path or instance identifier',
   })
   instance: string;
 
   @ApiProperty({
-    example: '2025-05-04T12:34:56.789Z',
-    description: 'Timestamp when the error occurred',
+    example: '2025-05-04T13:05:29.914Z',
+    description: 'ISO timestamp when error occurred',
   })
   timestamp: string;
 
   @ApiProperty({
     type: [ErrorDetail],
     required: false,
-    description: 'Optional list of field-level validation errors',
+    description: 'Field-level error details',
   })
   errors?: ErrorDetail[];
 }

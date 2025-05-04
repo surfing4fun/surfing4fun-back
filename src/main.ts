@@ -1,3 +1,4 @@
+// main.ts
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule, OpenAPIObject } from '@nestjs/swagger';
@@ -15,10 +16,11 @@ import { HttpErrorFilter } from './modules/helpers/filters/http-exception.filter
 
 async function bootstrap() {
   const isProd = process.env.NODE_ENV === 'production';
+
   const allowedOrigins = [
     !isProd && 'http://localhost:3010',
     'https://surfing4.fun',
-  ].filter((o): o is string => Boolean(o));
+  ].filter(Boolean) as string[];
 
   const app = await NestFactory.create(AppModule, {
     snapshot: true,
@@ -32,11 +34,11 @@ async function bootstrap() {
     rawBody: true,
   });
 
-  // Cookies & Validation
+  // Cookie parsing & validation
   app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe(validatorOptions));
 
-  // Swagger (non-prod only)
+  // Swagger (only non-production)
   if (!isProd) {
     const config = new DocumentBuilder()
       .addBearerAuth()
@@ -49,13 +51,32 @@ async function bootstrap() {
       extraModels: [ErrorResponseDto],
     });
 
-    // Default error responses for every operation
+    // Standard error responses with examples
     const defaultErrorResponses = {
       400: {
-        description: 'Bad Request',
+        description: 'Bad Request – invalid parameters',
         content: {
           'application/json': {
             schema: { $ref: '#/components/schemas/ErrorResponseDto' },
+            examples: {
+              BadRequest: {
+                summary: 'Validation errors',
+                value: {
+                  type: 'https://httpstatuses.com/400',
+                  title: 'BadRequest',
+                  status: 400,
+                  detail: 'One or more parameters failed validation',
+                  instance: '/recent-times?page=0&pageSize=101',
+                  errors: [
+                    {
+                      field: 'pageSize',
+                      message: 'must not be greater than 100',
+                    },
+                    { field: 'page', message: 'must be an integer' },
+                  ],
+                },
+              },
+            },
           },
         },
       },
@@ -64,6 +85,18 @@ async function bootstrap() {
         content: {
           'application/json': {
             schema: { $ref: '#/components/schemas/ErrorResponseDto' },
+            examples: {
+              Unauthorized: {
+                summary: 'Missing or invalid token',
+                value: {
+                  type: 'https://httpstatuses.com/401',
+                  title: 'Unauthorized',
+                  status: 401,
+                  detail: 'Authentication credentials were missing or invalid',
+                  instance: '/recent-times',
+                },
+              },
+            },
           },
         },
       },
@@ -72,6 +105,18 @@ async function bootstrap() {
         content: {
           'application/json': {
             schema: { $ref: '#/components/schemas/ErrorResponseDto' },
+            examples: {
+              Forbidden: {
+                summary: 'Access denied',
+                value: {
+                  type: 'https://httpstatuses.com/403',
+                  title: 'Forbidden',
+                  status: 403,
+                  detail: 'You do not have permission to access this resource',
+                  instance: '/admin/dashboard',
+                },
+              },
+            },
           },
         },
       },
@@ -80,6 +125,18 @@ async function bootstrap() {
         content: {
           'application/json': {
             schema: { $ref: '#/components/schemas/ErrorResponseDto' },
+            examples: {
+              NotFound: {
+                summary: 'Missing resource',
+                value: {
+                  type: 'https://httpstatuses.com/404',
+                  title: 'NotFound',
+                  status: 404,
+                  detail: 'The requested resource was not found',
+                  instance: '/recent-times/unknown-map',
+                },
+              },
+            },
           },
         },
       },
@@ -88,6 +145,18 @@ async function bootstrap() {
         content: {
           'application/json': {
             schema: { $ref: '#/components/schemas/ErrorResponseDto' },
+            examples: {
+              Conflict: {
+                summary: 'Duplicate entry',
+                value: {
+                  type: 'https://httpstatuses.com/409',
+                  title: 'Conflict',
+                  status: 409,
+                  detail: 'A record with these identifiers already exists',
+                  instance: '/users',
+                },
+              },
+            },
           },
         },
       },
@@ -96,6 +165,19 @@ async function bootstrap() {
         content: {
           'application/json': {
             schema: { $ref: '#/components/schemas/ErrorResponseDto' },
+            examples: {
+              Unprocessable: {
+                summary: 'Semantic validation error',
+                value: {
+                  type: 'https://httpstatuses.com/422',
+                  title: 'UnprocessableEntity',
+                  status: 422,
+                  detail:
+                    'The JSON data is syntactically correct but semantically invalid',
+                  instance: '/orders',
+                },
+              },
+            },
           },
         },
       },
@@ -104,6 +186,18 @@ async function bootstrap() {
         content: {
           'application/json': {
             schema: { $ref: '#/components/schemas/ErrorResponseDto' },
+            examples: {
+              TooManyRequests: {
+                summary: 'Rate limit reached',
+                value: {
+                  type: 'https://httpstatuses.com/429',
+                  title: 'TooManyRequests',
+                  status: 429,
+                  detail: 'Rate limit exceeded, retry after some time',
+                  instance: '/recent-times',
+                },
+              },
+            },
           },
         },
       },
@@ -112,20 +206,32 @@ async function bootstrap() {
         content: {
           'application/json': {
             schema: { $ref: '#/components/schemas/ErrorResponseDto' },
+            examples: {
+              ServerError: {
+                summary: 'Unexpected server failure',
+                value: {
+                  type: 'https://httpstatuses.com/500',
+                  title: 'InternalServerError',
+                  status: 500,
+                  detail: 'An unexpected error occurred',
+                  instance: '/recent-times',
+                },
+              },
+            },
           },
         },
       },
     };
 
-    // Inject into all paths & methods
-    Object.values(document.paths).forEach((pathItem) => {
-      Object.values(pathItem).forEach((operation: any) => {
-        operation.responses = {
+    // Inject into every operation's responses
+    for (const pathItem of Object.values(document.paths)) {
+      for (const op of Object.values(pathItem)) {
+        op.responses = {
           ...defaultErrorResponses,
-          ...operation.responses,
+          ...op.responses,
         };
-      });
-    });
+      }
+    }
 
     SwaggerModule.setup('docs', app, document);
   }
@@ -147,7 +253,7 @@ async function bootstrap() {
     new CacheVersioningInterceptor(),
   );
 
-  // Global exception filter
+  // Global filters
   app.useGlobalFilters(new HttpErrorFilter());
 
   await app.listen(process.env.API_PORT);
