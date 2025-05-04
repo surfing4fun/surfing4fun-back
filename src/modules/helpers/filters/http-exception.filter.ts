@@ -1,4 +1,3 @@
-// src/modules/helpers/filters/http-exception.filter.ts
 import {
   ExceptionFilter,
   Catch,
@@ -57,7 +56,7 @@ export class HttpErrorFilter implements ExceptionFilter {
     }
 
     // Map status code to official RFC7807 type URI
-    type = `https://httpstatuses.com/${status}`;
+    const type = `https://httpstatuses.com/${status}`;
 
     const errorResponse: ErrorResponseDto = {
       type,
