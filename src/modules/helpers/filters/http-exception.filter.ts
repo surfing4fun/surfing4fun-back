@@ -1,3 +1,6 @@
+import * as os from 'os';
+import * as process from 'process';
+
 import {
   ExceptionFilter,
   Catch,
@@ -9,14 +12,38 @@ import {
 import { Request, Response } from 'express';
 
 import { ErrorResponseDto, ErrorDetail } from '../dto/error-response.dto';
+import { DiscordLoggerService } from '../services/discord-logger.service';
 
 @Catch()
 export class HttpErrorFilter implements ExceptionFilter {
+  constructor(private readonly logger: DiscordLoggerService) {}
+
   catch(exc: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
+    const res = ctx.getResponse<Response>();
+    const req = ctx.getRequest<Request>();
 
+    if (res.headersSent) {
+      this.logger.error('Headers already sent');
+      return;
+    }
+
+    // — Request & user context —
+    const { method, url, params, query, body, headers } = req;
+    const clientIp = req.ip;
+    const userAgent = headers['user-agent'] || 'unknown';
+    const requestId = headers['x-request-id'] as string | undefined;
+    const userId = req.user && (req.user as any).id; // if usin g auth guard
+    const featureFlags = (req as any).featureFlags; // if middleware sets flags
+
+    // — System & deployment metadata —
+    const hostname = os.hostname();
+    const environment = process.env.NODE_ENV || 'unknown';
+    const commitSha = process.env.COMMIT_SHA || process.env.GIT_SHA;
+    const cpuUsage = JSON.stringify(process.cpuUsage());
+    const memUsage = JSON.stringify(process.memoryUsage());
+
+    // — Determine HTTP error details —
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let title = 'InternalServerError';
     let detail = 'Internal server error';
@@ -24,8 +51,6 @@ export class HttpErrorFilter implements ExceptionFilter {
 
     if (exc instanceof HttpException) {
       status = exc.getStatus();
-
-      // Use the exception payload if it's a BadRequestException
       if (exc instanceof BadRequestException) {
         const payload = exc.getResponse();
         if (
@@ -40,28 +65,26 @@ export class HttpErrorFilter implements ExceptionFilter {
             });
         }
       }
-
-      // Map status → title/detail
       switch (status) {
         case HttpStatus.BAD_REQUEST:
           title = 'BadRequest';
-          detail = 'One or more parameters failed validation';
+          detail = 'Validation failed';
           break;
         case HttpStatus.UNAUTHORIZED:
           title = 'Unauthorized';
-          detail = 'Authentication credentials were missing or invalid';
+          detail = 'Invalid credentials';
           break;
         case HttpStatus.FORBIDDEN:
           title = 'Forbidden';
-          detail = 'You do not have permission to access this resource';
+          detail = 'Access denied';
           break;
         case HttpStatus.NOT_FOUND:
           title = 'NotFound';
-          detail = 'Requested resource was not found';
+          detail = 'Resource not found';
           break;
         case HttpStatus.CONFLICT:
           title = 'Conflict';
-          detail = 'Request conflicts with current resource state';
+          detail = 'Conflict occurred';
           break;
         case HttpStatus.UNPROCESSABLE_ENTITY:
           title = 'UnprocessableEntity';
@@ -72,31 +95,53 @@ export class HttpErrorFilter implements ExceptionFilter {
           detail = 'Rate limit exceeded';
           break;
         default:
-          // For other HttpExceptions, attempt to pull message/error from payload
-          const responsePayload = exc.getResponse();
-          if (typeof responsePayload === 'object') {
-            detail = (responsePayload as any).message ?? exc.message;
-            title = (responsePayload as any).error ?? exc.name;
-          } else if (typeof responsePayload === 'string') {
-            detail = responsePayload;
+          const resp = exc.getResponse();
+          if (typeof resp === 'object') {
+            detail = (resp as any).message ?? exc.message;
+            title = (resp as any).error ?? exc.name;
+          } else if (typeof resp === 'string') {
+            detail = resp;
             title = exc.name;
           }
       }
     }
 
-    // RFC 7807 type URI
+    // — Build HTTP error response (RFC-7807) —
     const type = `https://httpstatuses.com/${status}`;
-
     const errorResponse: ErrorResponseDto = {
       type,
       title,
       status,
       detail,
-      instance: request.url,
+      instance: url,
       timestamp: new Date().toISOString(),
       errors,
     };
 
-    response.status(status).json(errorResponse);
+    // — Send to Discord with full context —
+    this.logger.errorEmbed({
+      title: `❌ Error: [${method}] ${url}`,
+      description: detail,
+      httpStatus: status,
+      params,
+      query,
+      body: body && Object.keys(body).length ? body : undefined,
+      clientIp,
+      userAgent,
+      requestId,
+      userId,
+      featureFlags,
+      hostname,
+      environment,
+      commitSha,
+      cpuUsage,
+      memoryUsage: memUsage,
+      traceId: headers['x-trace-id'] as string | undefined,
+      spanId: headers['x-span-id'] as string | undefined,
+      stack: exc instanceof Error ? exc.stack : undefined,
+    });
+
+    // — Return JSON to client —
+    res.status(status).json(errorResponse);
   }
 }

@@ -1,4 +1,3 @@
-// main.ts
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule, OpenAPIObject } from '@nestjs/swagger';
@@ -7,20 +6,28 @@ import session from 'express-session';
 
 import { validatorOptions } from './configs/validator-options';
 import { CacheVersioningInterceptor } from './interceptors/cache-versioning.interceptor';
+import { ObservabilityInterceptor } from './interceptors/observability.interceptor';
 import { PaginationHeadersInterceptor } from './interceptors/pagination-headers.interceptor';
 import { ResponseTimeInterceptor } from './interceptors/respone-time.interceptor';
 import { WrapResponseInterceptor } from './interceptors/wrap-response.interceptor';
 import { AppModule } from './modules/app/app.module';
 import { ErrorResponseDto } from './modules/helpers/dto/error-response.dto';
 import { HttpErrorFilter } from './modules/helpers/filters/http-exception.filter';
+import { DiscordLoggerService } from './modules/helpers/services/discord-logger.service';
+import { MetricsService } from './modules/helpers/services/metrics.service';
 
 async function bootstrap() {
   const isProd = process.env.NODE_ENV === 'production';
+
+  const discordLogger = new DiscordLoggerService();
+  const metrics = new MetricsService();
 
   const allowedOrigins = [
     !isProd && 'http://localhost:3010',
     'https://surfing4.fun',
   ].filter(Boolean) as string[];
+
+  const abortOnError = isProd ? true : false;
 
   const app = await NestFactory.create(AppModule, {
     snapshot: true,
@@ -32,6 +39,8 @@ async function bootstrap() {
       exposedHeaders: ['Set-Cookie'],
     },
     rawBody: true,
+    logger: discordLogger,
+    abortOnError: abortOnError,
   });
 
   // Cookie parsing & validation
@@ -247,6 +256,7 @@ async function bootstrap() {
 
   // Global interceptors
   app.useGlobalInterceptors(
+    new ObservabilityInterceptor(discordLogger, metrics),
     new WrapResponseInterceptor(),
     new ResponseTimeInterceptor(),
     new CacheVersioningInterceptor(),
@@ -254,7 +264,7 @@ async function bootstrap() {
   );
 
   // Global filters
-  app.useGlobalFilters(new HttpErrorFilter());
+  app.useGlobalFilters(new HttpErrorFilter(discordLogger));
 
   await app.listen(process.env.API_PORT);
 }

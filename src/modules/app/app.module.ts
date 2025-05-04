@@ -18,10 +18,10 @@ import { PaymentModule } from '../api/payment/payment.module';
 import { StripeModule } from '../api/payment/stripe/stripe.module';
 import { ServerHealthModule } from '../api/server-health/server-health.module';
 import { SurfModule } from '../api/surf/surf.module';
+import { HelpersModule } from '../helpers/helpers.module';
 import { EventsModule } from '../shared/events/events.module';
 import { PrismaModule } from '../shared/prisma/prisma.module';
 import { SseModule } from '../shared/sse/sse.module';
-
 @Module({
   imports: [
     PrismaModule,
@@ -44,6 +44,7 @@ import { SseModule } from '../shared/sse/sse.module';
     ServerHealthModule,
     SurfModule,
     BhopModule,
+    HelpersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
