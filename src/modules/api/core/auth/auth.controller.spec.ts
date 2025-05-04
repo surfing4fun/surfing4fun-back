@@ -10,6 +10,7 @@ import { jwtConstants } from './constants';
 import { JwtAuthGuard } from './guards/jwt.guard';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
+
 import { UsersModule } from '../users/users.module';
 
 describe('AuthController', () => {

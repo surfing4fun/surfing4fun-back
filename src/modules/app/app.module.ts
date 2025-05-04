@@ -5,6 +5,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+
 import { BhopModule } from '../api/bhop/bhop.module';
 import { AuthModule } from '../api/core/auth/auth.module';
 import { PermissionRolesModule } from '../api/core/permission-roles/permission-roles.module';

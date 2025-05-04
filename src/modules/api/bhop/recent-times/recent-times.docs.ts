@@ -1,7 +1,5 @@
 import { applyDecorators } from '@nestjs/common';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-
-export const RecentTimesApiTags = () => ApiTags('Bhop Recent Times');
+import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 
 export const GetRecentTimesApiOperation = () =>
   ApiOperation({

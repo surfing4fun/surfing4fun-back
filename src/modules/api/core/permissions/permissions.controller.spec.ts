@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { PermissionsController } from './permissions.controller';
 import { PermissionsService } from './permissions.service';
+
 import { PrismaModule } from '../../shared/prisma/prisma.module';
 
 describe('PermissionsController', () => {

@@ -3,6 +3,7 @@ import { EmailService } from 'src/modules/shared/email/email.service';
 import { normalizePermissions } from 'src/utils/normalizePermissions';
 
 import { RefreshTokenService } from './refresh-token.service';
+
 import { PaymentService } from '../../payment/payment.service';
 import { User } from '../users/entity/user';
 

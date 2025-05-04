@@ -4,6 +4,7 @@ import { PrismaModule } from 'src/modules/shared/prisma/prisma.module';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
+
 import { RolesModule } from '../roles/roles.module';
 
 describe('UsersController', () => {

@@ -1,14 +1,14 @@
 import { Controller, Get, Query } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/decorators/Public.decorator';
 
 import {
   GetRecentTimesApiOperation,
   GetRecentTimesApiResponse,
-  RecentTimesApiTags,
 } from './recent-times.docs';
 import { RecentTimesService } from './recent-times.service';
 
-@RecentTimesApiTags()
+@ApiTags('Bhop')
 @Public()
 @Controller('recent-times')
 export class RecentTimesController {

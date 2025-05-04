@@ -1,6 +1,4 @@
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-
-export const UsersApiTags = () => ApiTags('Bhop Users');
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 export const GetUsersApiOperation = () =>
   ApiOperation({

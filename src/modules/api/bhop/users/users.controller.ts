@@ -1,14 +1,11 @@
 import { Controller, Get, Param } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/decorators/Public.decorator';
 
-import {
-  GetUsersApiOperation,
-  GetUsersApiResponse,
-  UsersApiTags,
-} from './users.docs';
+import { GetUsersApiOperation, GetUsersApiResponse } from './users.docs';
 import { UsersService } from './users.service';
 
-@UsersApiTags()
+@ApiTags('Bhop')
 @Public()
 @Controller('users')
 export class UsersController {

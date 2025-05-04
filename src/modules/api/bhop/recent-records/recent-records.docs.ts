@@ -1,6 +1,4 @@
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-
-export const RecentRecordsApiTags = () => ApiTags('Bhop Recent Records');
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 export const GetRecentRecordsApiOperation = () =>
   ApiOperation({

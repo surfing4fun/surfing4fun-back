@@ -6,6 +6,7 @@ import { normalizePermissions } from 'src/utils/normalizePermissions';
 import Stripe from 'stripe';
 
 import { StripeService } from './stripe.service';
+
 import { RefreshTokenService } from '../../core/auth/refresh-token.service';
 import { UsersService } from '../../core/users/users.service';
 import { PaymentService } from '../payment.service';

@@ -1,6 +1,4 @@
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-
-export const ServerStatusApiTags = () => ApiTags('Bhop Server Status');
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 export const GetServerStatusApiOperation = () =>
   ApiOperation({

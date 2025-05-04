@@ -13,6 +13,7 @@ import { SseService } from 'src/modules/shared/sse/sse.service';
 
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
+
 import { EPermission } from '../permissions/entities/permission.entity';
 import { RolesService } from '../roles/roles.service';
 

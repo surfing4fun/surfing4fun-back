@@ -6,6 +6,7 @@ import { PrismaModule } from 'src/modules/shared/prisma/prisma.module';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
+
 import { RolesModule } from '../roles/roles.module';
 
 jest.mock('bcrypt', () => ({

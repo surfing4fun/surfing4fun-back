@@ -1,14 +1,14 @@
 import { Controller, Get } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/decorators/Public.decorator';
 
 import {
   GetServerStatusApiOperation,
   GetServerStatusApiResponse,
-  ServerStatusApiTags,
 } from './server-status.docs';
 import { ServerStatusService } from './server-status.service';
 
-@ServerStatusApiTags()
+@ApiTags('Bhop')
 @Public()
 @Controller('server-status')
 export class ServerStatusController {

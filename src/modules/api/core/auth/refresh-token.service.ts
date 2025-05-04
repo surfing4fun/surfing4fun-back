@@ -5,6 +5,7 @@ import { DashboardPrismaService } from 'src/modules/shared/prisma/dashboard.serv
 
 import { jwtConstants } from './constants';
 import { IAuthenticatedUser } from './dto/authenticate-user.dto';
+
 import { User } from '../users/entity/user';
 
 @Injectable()
