@@ -10,7 +10,7 @@ export class MapsService {
   @MeasureRequestDuration()
   async getMaps(map?: string) {
     try {
-      const where = map ? { map } : {};
+      const where = map ? { map: { equals: map } } : {};
 
       const maps = await this.prisma.maptiers.findMany({
         where,

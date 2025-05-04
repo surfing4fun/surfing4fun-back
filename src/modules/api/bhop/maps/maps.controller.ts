@@ -19,7 +19,7 @@ export class MapsController {
 
   @getMapByMapDocs()
   @Get(':map')
-  async getMaptierByMap(@Param('map') map: string) {
-    return this.mapsService.getMaps({ map });
+  async getMapByMap(@Param('map') map: string) {
+    return this.mapsService.getMaps(map);
   }
 }
