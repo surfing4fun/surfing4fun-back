@@ -1,4 +1,3 @@
-// src/common/interceptors/wrap-response.interceptor.ts
 import {
   Injectable,
   NestInterceptor,

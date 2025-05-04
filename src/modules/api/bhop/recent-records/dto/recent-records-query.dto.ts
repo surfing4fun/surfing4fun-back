@@ -1,25 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
+import { PaginationDto } from 'src/modules/helpers/dto/pagination.dto';
 
-export class BhopRecentRecordsQueryDto {
-  @ApiProperty({
-    required: false,
-    description: 'Page number',
-    example: '1',
-  })
-  @IsOptional()
-  @IsString()
-  page?: string;
-
-  @ApiProperty({
-    required: false,
-    description: 'Items per page',
-    example: '10',
-  })
-  @IsOptional()
-  @IsString()
-  pageSize?: string;
-
+export class BhopRecentRecordsQueryDto extends PaginationDto {
   @ApiProperty({
     required: false,
     description: 'Filter by map name',

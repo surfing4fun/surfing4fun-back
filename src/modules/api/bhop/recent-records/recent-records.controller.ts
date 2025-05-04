@@ -2,11 +2,11 @@ import { Controller, Get, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/decorators/Public.decorator';
 
-import {
-  GetRecentRecordsApiOperation,
-  GetRecentRecordsApiResponse,
-} from './recent-records.docs';
+import { BhopRecentRecordsQueryDto } from './dto/recent-records-query.dto';
+import { BhopRecentRecordsResponseDto } from './dto/recent-records-response.dto';
 import { RecentRecordsService } from './recent-records.service';
+
+import { getRecentRecordsDocs } from '../../bhop/recent-records/recent-records.docs';
 
 @ApiTags('Bhop')
 @Public()
@@ -14,24 +14,17 @@ import { RecentRecordsService } from './recent-records.service';
 export class RecentRecordsController {
   constructor(private readonly recentRecordsService: RecentRecordsService) {}
 
-  @GetRecentRecordsApiOperation()
-  @GetRecentRecordsApiResponse()
+  @getRecentRecordsDocs()
   @Get()
   async getRecentRecords(
-    @Query('page') page: string = '1',
-    @Query('pageSize') pageSize: string = '10',
-    @Query('map') map?: string,
-    @Query('style') style?: string,
-    @Query('track') track?: string,
-  ) {
-    const pageNum = Math.max(1, parseInt(page, 10) || 1);
-    const pageSizeNum = Math.max(1, parseInt(pageSize, 10) || 10);
+    @Query() query: BhopRecentRecordsQueryDto,
+  ): Promise<BhopRecentRecordsResponseDto> {
     return this.recentRecordsService.getRecentRecords({
-      page: pageNum,
-      pageSize: pageSizeNum,
-      map,
-      style: style !== undefined ? Number(style) : undefined,
-      track: track !== undefined ? Number(track) : undefined,
+      page: query.page,
+      pageSize: query.pageSize,
+      map: query.map,
+      style: query.style,
+      track: query.track,
     });
   }
 }
