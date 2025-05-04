@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import session from 'express-session';
 
 import { validatorOptions } from './configs/validator-options';
+import { PaginationHeadersInterceptor } from './interceptors/pagination-headers.interceptor';
 import { ResponseTimeInterceptor } from './interceptors/respone-time.interceptor';
 import { WrapResponseInterceptor } from './interceptors/wrap-response.interceptor';
 import { AppModule } from './modules/app/app.module';
@@ -54,10 +55,11 @@ async function bootstrap() {
     }),
   );
 
-  // Measure duration of requests and wrap response
+  // Me
   app.useGlobalInterceptors(
     new WrapResponseInterceptor(),
     new ResponseTimeInterceptor(),
+    new PaginationHeadersInterceptor(),
   );
 
   await app.listen(process.env.API_PORT);

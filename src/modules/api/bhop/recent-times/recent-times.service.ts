@@ -91,7 +91,7 @@ export class RecentTimesService {
           );
           flag =
             await this.countryFlagService.getCountryFlagByCountryCode(country);
-        } catch {
+        } catch (error) {
           // ignore errors
         }
 
