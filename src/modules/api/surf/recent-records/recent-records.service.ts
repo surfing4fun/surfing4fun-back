@@ -1,4 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { PaginationLinksResponseDto } from 'src/modules/helpers/dto/pagination-links-response.dto';
+import { PaginationMetaResponseDto } from 'src/modules/helpers/dto/pagination-meta-response.dto';
+
+import { SurfRecentRecordDto } from './dto/recent-record.dto';
+import { SurfRecentRecordsQueryDto } from './dto/recent-records-query.dto';
+import { SurfRecentRecordsResponseDto } from './dto/recent-records-response.dto';
 
 import { SurfPrismaService } from '../../../shared/prisma/surf.service';
 import { CountryFlagService } from '../../country-flag/country-flag.service';
@@ -14,20 +20,13 @@ export class RecentRecordsService {
     private readonly countryFlagService: CountryFlagService,
   ) {}
 
-  async getRecentRecords({
-    page = 1,
-    pageSize = 10,
-    map,
-    style,
-    track,
-  }: {
-    page: number;
-    pageSize: number;
-    map?: string;
-    style?: number;
-    track?: number;
-  }) {
-    const skip = (page - 1) * pageSize;
+  async getRecentRecords(
+    query: SurfRecentRecordsQueryDto,
+  ): Promise<SurfRecentRecordsResponseDto> {
+    const { page, pageSize, map, style, track } = query;
+    const pageNum = Math.max(1, parseInt(page, 10));
+    const pageSizeNum = Math.max(1, parseInt(pageSize, 10));
+    const skip = (pageNum - 1) * pageSizeNum;
 
     const whereClauses = [];
     if (map) whereClauses.push(`pt.map = '${map}'`);
@@ -68,7 +67,7 @@ export class RecentRecordsService {
         AND rt2.time_rank = 2
       WHERE rt1.time_rank = 1
       ORDER BY rt1.date DESC
-      LIMIT ${pageSize} OFFSET ${skip};
+      LIMIT ${pageSizeNum} OFFSET ${skip};
     `;
 
     const records = await this.prisma.$queryRawUnsafe<any[]>(sql);
@@ -76,7 +75,7 @@ export class RecentRecordsService {
     const totalResult = await this.prisma.$queryRawUnsafe<any[]>(
       `SELECT COUNT(*) as count FROM playertimes pt ${whereSQL}`,
     );
-    const total = totalResult[0]?.count || 0;
+    const total = Number(totalResult[0]?.count || 0);
 
     const playerSummaries = await Promise.all(
       records.map((record) =>
@@ -84,7 +83,7 @@ export class RecentRecordsService {
       ),
     );
 
-    const data = await Promise.all(
+    const data: SurfRecentRecordDto[] = await Promise.all(
       records.map(async (record, idx) => {
         const runTimeDifference =
           record.second_best_time !== null
@@ -131,11 +130,32 @@ export class RecentRecordsService {
       }),
     );
 
+    const totalPages = Math.ceil(total / pageSizeNum);
+    const meta: PaginationMetaResponseDto = {
+      page: pageNum,
+      pageSize: pageSizeNum,
+      total,
+    };
+
+    const baseUrl = '/recent-records';
+    const links: PaginationLinksResponseDto = {
+      self: `${baseUrl}?page=${pageNum}&pageSize=${pageSizeNum}`,
+      first: `${baseUrl}?page=1&pageSize=${pageSizeNum}`,
+      last: `${baseUrl}?page=${totalPages}&pageSize=${pageSizeNum}`,
+      prev:
+        pageNum > 1
+          ? `${baseUrl}?page=${pageNum - 1}&pageSize=${pageSizeNum}`
+          : null,
+      next:
+        pageNum < totalPages
+          ? `${baseUrl}?page=${pageNum + 1}&pageSize=${pageSizeNum}`
+          : null,
+    };
+
     return {
       data,
-      page,
-      pageSize,
-      total: Number(total),
+      meta,
+      links,
     };
   }
 }

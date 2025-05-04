@@ -2,6 +2,8 @@ import { Controller, Get, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/decorators/Public.decorator';
 
+import { SurfRecentRecordsQueryDto } from './dto/recent-records-query.dto';
+import { SurfRecentRecordsResponseDto } from './dto/recent-records-response.dto';
 import { getRecentRecordsDocs } from './recent-records.docs';
 import { RecentRecordsService } from './recent-records.service';
 
@@ -14,20 +16,14 @@ export class RecentRecordsController {
   @getRecentRecordsDocs()
   @Get()
   async getRecentRecords(
-    @Query('page') page: string = '1',
-    @Query('pageSize') pageSize: string = '10',
-    @Query('map') map?: string,
-    @Query('style') style?: string,
-    @Query('track') track?: string,
-  ) {
-    const pageNum = Math.max(1, parseInt(page, 10) || 1);
-    const pageSizeNum = Math.max(1, parseInt(pageSize, 10) || 10);
+    @Query() query: SurfRecentRecordsQueryDto,
+  ): Promise<SurfRecentRecordsResponseDto> {
     return this.recentRecordsService.getRecentRecords({
-      page: pageNum,
-      pageSize: pageSizeNum,
-      map,
-      style: style !== undefined ? Number(style) : undefined,
-      track: track !== undefined ? Number(track) : undefined,
+      page: query.page,
+      pageSize: query.pageSize,
+      map: query.map,
+      style: query.style,
+      track: query.track,
     });
   }
 }
