@@ -80,7 +80,7 @@ export class RecentTimesService {
     );
 
     const data: SurfRecentTimeDto[] = await Promise.all(
-      paged.data.map(async (time, i) => {
+      paged.data.map(async (time, idx) => {
         const runTimeDiff =
           time.best_time != null ? time.time - time.best_time : null;
 
@@ -96,7 +96,7 @@ export class RecentTimesService {
           // ignore errors
         }
 
-        const sum = summaries[i];
+        const sum = summaries[idx];
         const dto = new SurfRecentTimeDto();
         dto.date = time.date;
         dto.map = time.map;
@@ -108,7 +108,7 @@ export class RecentTimesService {
         dto.playerLocationCountry = country;
         dto.playerLocationCountryFlag = flag;
         dto.points = time.points;
-        dto.rank = (page - 1) * pageSize + i + 1;
+        dto.rank = (page - 1) * pageSize + idx + 1;
         dto.runTime = time.time;
         dto.runTimeDifference = runTimeDiff;
         dto.style = Style[time.style];

@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PaginationLinksResponseDto } from 'src/modules/helpers/dto/pagination-links-response.dto';
 import { PaginationMetaResponseDto } from 'src/modules/helpers/dto/pagination-meta-response.dto';
+import {
+  PaginatorService,
+  PrismaQueryable,
+} from 'src/modules/helpers/services/paginator.service';
 
 import { SurfRecentRecordDto } from './dto/recent-record.dto';
 import { SurfRecentRecordsQueryDto } from './dto/recent-records-query.dto';
@@ -18,48 +22,39 @@ export class RecentRecordsService {
     private readonly prisma: SurfPrismaService,
     private readonly steamService: SteamService,
     private readonly countryFlagService: CountryFlagService,
+    private readonly paginator: PaginatorService,
   ) {}
 
   async getRecentRecords(
     query: SurfRecentRecordsQueryDto,
   ): Promise<SurfRecentRecordsResponseDto> {
     const { page, pageSize, map, style, track } = query;
-    const pageNum = Math.max(1, parseInt(page, 10));
-    const pageSizeNum = Math.max(1, parseInt(pageSize, 10));
-    const skip = (pageNum - 1) * pageSizeNum;
+    const pageNum = Math.max(1, Number(page));
+    const pageSizeNum = Math.max(1, Number(pageSize));
 
-    const whereClauses = [];
-    if (map) whereClauses.push(`pt.map = '${map}'`);
-    if (typeof style === 'number') whereClauses.push(`pt.style = ${style}`);
-    if (typeof track === 'number') whereClauses.push(`pt.track = ${track}`);
-    const whereSQL = whereClauses.length
-      ? 'WHERE ' + whereClauses.join(' AND ')
-      : '';
+    const clauses: string[] = [];
+    if (map) clauses.push(`pt.map = '${map}'`);
+    if (typeof style === 'number') clauses.push(`pt.style = ${style}`);
+    if (typeof track === 'number') clauses.push(`pt.track = ${track}`);
+    const whereSql = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
 
-    const sql = `
+    const baseSql = `
       WITH ranked_times AS (
         SELECT
-          pt.id,
-          pt.auth,
-          pt.map,
-          pt.track,
-          pt.time,
-          pt.points,
-          pt.date,
-          pt.style,
-          u.auth AS user_auth,
-          u.ip AS user_ip,
-          mt.map_type,
-          mt.tier,
-          ROW_NUMBER() OVER (PARTITION BY pt.map, pt.track ORDER BY pt.time ASC) AS time_rank
+          pt.id, pt.auth, pt.map, pt.track, pt.time,
+          pt.points, pt.date, pt.style,
+          u.auth AS user_auth, u.ip AS user_ip,
+          mt.map_type, mt.tier,
+          ROW_NUMBER() OVER (
+            PARTITION BY pt.map, pt.track
+            ORDER BY pt.time ASC
+          ) AS time_rank
         FROM playertimes pt
-        LEFT JOIN users u ON pt.auth = u.auth
+        LEFT JOIN users u     ON pt.auth = u.auth
         LEFT JOIN maptiers mt ON pt.map = mt.map
-        ${whereSQL}
+        ${whereSql}
       )
-      SELECT
-        rt1.*,
-        rt2.time AS second_best_time
+      SELECT rt1.*, rt2.time AS second_best_time
       FROM ranked_times rt1
       LEFT JOIN ranked_times rt2
         ON rt1.map = rt2.map
@@ -67,95 +62,62 @@ export class RecentRecordsService {
         AND rt2.time_rank = 2
       WHERE rt1.time_rank = 1
       ORDER BY rt1.date DESC
-      LIMIT ${pageSizeNum} OFFSET ${skip};
     `;
 
-    const records = await this.prisma.$queryRawUnsafe<any[]>(sql);
-
-    const totalResult = await this.prisma.$queryRawUnsafe<any[]>(
-      `SELECT COUNT(*) as count FROM playertimes pt ${whereSQL}`,
-    );
-    const total = Number(totalResult[0]?.count || 0);
-
-    const playerSummaries = await Promise.all(
-      records.map((record) =>
-        this.steamService.getPlayerSummary(String(record.auth)),
-      ),
+    const paged = await this.paginator.paginateSqlAutoCount<any>(
+      this.prisma as unknown as PrismaQueryable,
+      baseSql,
+      'playertimes pt',
+      whereSql,
+      pageNum,
+      pageSizeNum,
+      (p) => `/recent-records?page=${p}&pageSize=${pageSizeNum}`,
     );
 
-    const data: SurfRecentRecordDto[] = await Promise.all(
-      records.map(async (record, idx) => {
-        const runTimeDifference =
-          record.second_best_time !== null
-            ? record.time - record.second_best_time
-            : null;
-
-        let playerLocationCountry: string | null = null;
-        let playerLocationCountryFlag: string | null = null;
-        try {
-          playerLocationCountry =
-            await this.countryFlagService.getCountryCodeByLongIp(
-              record.user_ip,
-            );
-          playerLocationCountryFlag =
-            await this.countryFlagService.getCountryFlagByCountryCode(
-              playerLocationCountry,
-            );
-        } catch (error) {
-          console.error(
-            `Error fetching country flag for IP ${record.user_ip}:`,
-            error,
-          );
-        }
-
-        const playerSummary = playerSummaries[idx];
-        return {
-          date: record.date,
-          map: record.map,
-          mapType: record.map_type,
-          player: record.user_auth ?? record.auth,
-          playerNickname: playerSummary?.nickname ?? null,
-          playerProfileUrl: playerSummary?.profileUrl ?? null,
-          playerAvatar: playerSummary?.avatar ?? null,
-          playerLocationCountry,
-          playerLocationCountryFlag,
-          points: record.points,
-          rank: skip + idx + 1,
-          runTime: record.time,
-          runTimeDifference,
-          style: Style[record.style],
-          tier: record.tier,
-          track: Track[record.track],
-        };
-      }),
+    const summaries = await Promise.all(
+      paged.data.map((r) => this.steamService.getPlayerSummary(String(r.auth))),
     );
 
-    const totalPages = Math.ceil(total / pageSizeNum);
-    const meta: PaginationMetaResponseDto = {
-      page: pageNum,
-      pageSize: pageSizeNum,
-      total,
-    };
+    const data: SurfRecentRecordDto[] = paged.data.map((record, idx) => {
+      const secondTime = (record as any).second_best_time as number | null;
+      const runTimeDiff = secondTime != null ? record.time - secondTime : null;
 
-    const baseUrl = '/recent-records';
-    const links: PaginationLinksResponseDto = {
-      self: `${baseUrl}?page=${pageNum}&pageSize=${pageSizeNum}`,
-      first: `${baseUrl}?page=1&pageSize=${pageSizeNum}`,
-      last: `${baseUrl}?page=${totalPages}&pageSize=${pageSizeNum}`,
-      prev:
-        pageNum > 1
-          ? `${baseUrl}?page=${pageNum - 1}&pageSize=${pageSizeNum}`
-          : null,
-      next:
-        pageNum < totalPages
-          ? `${baseUrl}?page=${pageNum + 1}&pageSize=${pageSizeNum}`
-          : null,
-    };
+      let country: string | null = null;
+      let flag: string | null = null;
+      try {
+        country = this.countryFlagService.getCountryCodeByLongIp(
+          record.user_ip,
+        );
+        flag = this.countryFlagService.getCountryFlagByCountryCode(country);
+      } catch {
+        // ignore
+      }
+
+      const sum = summaries[idx];
+      return {
+        date: record.date,
+        map: record.map,
+        mapType: record.map_type,
+        player: record.user_auth ?? record.auth,
+        playerNickname: sum?.nickname ?? null,
+        playerProfileUrl: sum?.profileUrl ?? null,
+        playerAvatar: sum?.avatar ?? null,
+        playerLocationCountry: country,
+        playerLocationCountryFlag: flag,
+        points: record.points,
+        rank: (paged.meta.page - 1) * paged.meta.pageSize + idx + 1,
+        runTime: record.time,
+        runTimeDifference: runTimeDiff,
+        style: Style[record.style],
+        tier: record.tier,
+        track: Track[record.track],
+      };
+    });
 
     return {
       data,
-      meta,
-      links,
+      meta: paged.meta as PaginationMetaResponseDto,
+      links: paged.links as PaginationLinksResponseDto,
     };
   }
 }
