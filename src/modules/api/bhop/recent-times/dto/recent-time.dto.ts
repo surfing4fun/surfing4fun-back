@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class RecentTimeDto {
+export class BhopRecentTimeDto {
   @ApiProperty({
     example: 1622470423,
     description: 'Unix epoch timestamp when run occurred',

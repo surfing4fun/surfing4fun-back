@@ -2,7 +2,7 @@ import { Controller, Get, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/decorators/Public.decorator';
 
-import { RecentTimesQueryDto } from './dto/recent-times-query.dto';
+import { SurfRecentTimesQueryDto } from './dto/recent-times-query.dto';
 import { getRecentTimesDocs } from './recent-times.docs';
 import { RecentTimesService } from './recent-times.service';
 
@@ -14,7 +14,7 @@ export class RecentTimesController {
 
   @getRecentTimesDocs()
   @Get()
-  async getRecentTimes(@Query() query: RecentTimesQueryDto) {
+  async getRecentTimes(@Query() query: SurfRecentTimesQueryDto) {
     return this.recentTimesService.getRecentTimes(query);
   }
 }

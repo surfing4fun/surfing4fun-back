@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PaginatorService } from 'src/modules/helpers/services/paginator.service';
 
-import { RecentTimeDto } from './dto/recent-time.dto';
-import { RecentTimesQueryDto } from './dto/recent-times-query.dto';
-import { RecentTimesResponseDto } from './dto/recent-times-response.dto';
+import { SurfRecentTimeDto } from './dto/recent-time.dto';
+import { SurfRecentTimesQueryDto } from './dto/recent-times-query.dto';
+import { SurfRecentTimesResponseDto } from './dto/recent-times-response.dto';
 
 import { SurfPrismaService } from '../../../shared/prisma/surf.service';
 import { CountryFlagService } from '../../country-flag/country-flag.service';
@@ -21,8 +21,8 @@ export class RecentTimesService {
   ) {}
 
   async getRecentTimes(
-    query: RecentTimesQueryDto,
-  ): Promise<RecentTimesResponseDto> {
+    query: SurfRecentTimesQueryDto,
+  ): Promise<SurfRecentTimesResponseDto> {
     const { page, pageSize, map, style, track } = query;
 
     const clauses: string[] = [];
@@ -79,7 +79,7 @@ export class RecentTimesService {
       paged.data.map((t) => this.steamService.getPlayerSummary(String(t.auth))),
     );
 
-    const data: RecentTimeDto[] = await Promise.all(
+    const data: SurfRecentTimeDto[] = await Promise.all(
       paged.data.map(async (time, i) => {
         const runTimeDiff =
           time.best_time != null ? time.time - time.best_time : null;
@@ -97,7 +97,7 @@ export class RecentTimesService {
         }
 
         const sum = summaries[i];
-        const dto = new RecentTimeDto();
+        const dto = new SurfRecentTimeDto();
         dto.date = time.date;
         dto.map = time.map;
         dto.mapType = time.map_type;

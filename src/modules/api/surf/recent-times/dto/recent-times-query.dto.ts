@@ -2,7 +2,7 @@ import { Type } from 'class-transformer';
 import { IsOptional, IsString, IsInt } from 'class-validator';
 import { PaginationDto } from 'src/modules/helpers/dto/pagination.dto';
 
-export class RecentTimesQueryDto extends PaginationDto {
+export class SurfRecentTimesQueryDto extends PaginationDto {
   @IsOptional()
   @IsString()
   map?: string;
