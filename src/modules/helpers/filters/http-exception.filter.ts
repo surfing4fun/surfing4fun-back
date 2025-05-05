@@ -118,7 +118,7 @@ export class HttpErrorFilter implements ExceptionFilter {
     };
 
     // — Send to Discord with full context —
-    this.logger.errorEmbed({
+    this.logger.sendErrorEmbedOptions({
       title: `❌ Error: [${method}] ${url}`,
       description: detail,
       httpStatus: status,

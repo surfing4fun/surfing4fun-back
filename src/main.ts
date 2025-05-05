@@ -19,9 +19,6 @@ import { MetricsService } from './modules/helpers/services/metrics.service';
 async function bootstrap() {
   const isProd = process.env.NODE_ENV === 'production';
 
-  const discordLogger = new DiscordLoggerService();
-  const metrics = new MetricsService();
-
   const allowedOrigins = [
     !isProd && 'http://localhost:3010',
     'https://surfing4.fun',
@@ -39,7 +36,6 @@ async function bootstrap() {
       exposedHeaders: ['Set-Cookie'],
     },
     rawBody: true,
-    logger: discordLogger,
     abortOnError: abortOnError,
   });
 
@@ -253,6 +249,10 @@ async function bootstrap() {
       saveUninitialized: false,
     }),
   );
+
+  // Inject services
+  const discordLogger = app.get(DiscordLoggerService);
+  const metrics = app.get(MetricsService);
 
   // Global interceptors
   app.useGlobalInterceptors(

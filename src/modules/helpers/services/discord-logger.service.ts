@@ -1,5 +1,3 @@
-// src/modules/helpers/services/discord-logger.service.ts
-
 import { Injectable, LoggerService } from '@nestjs/common';
 import { Client, TextChannel, GatewayIntentBits, APIEmbed } from 'discord.js';
 
@@ -70,41 +68,28 @@ export class DiscordLoggerService implements LoggerService {
     });
   }
 
-  // ─── LOGS ──────────────────────────────────────────────────────────────────
+  // ─── PUBLIC: send a log‐level embed ─────────────────────────────────────────
 
-  log(message: string) {
-    const raw = this.buildRawEmbed('📗 API Log', 0x00aeff, message);
-    this.safeSendRaw(this.logChannel, raw, () => this.fallback.log(message));
-  }
-
-  warn(message: string) {
-    const raw = this.buildRawEmbed('📙 API Warning', 0xffa500, message);
-    this.safeSendRaw(this.logChannel, raw, () => this.fallback.warn(message));
-  }
-
-  debug(message: string) {
-    const raw = this.buildRawEmbed('📘 API Debug', 0x800080, message);
-    this.safeSendRaw(this.logChannel, raw, () => this.fallback.debug(message));
-  }
-
-  verbose(message: string) {
-    const raw = this.buildRawEmbed('📓 API Verbose', 0x808080, message);
+  /**
+   * Send an embed message to the log channel.
+   * @param title   Embed title
+   * @param desc    Embed description
+   * @param color   Embed color (default 0x00aeff)
+   */
+  sendLogEmbed(title: string, desc: string, color = 0x00aeff) {
+    const raw = this.buildRawEmbed(title, color, desc);
     this.safeSendRaw(this.logChannel, raw, () =>
-      this.fallback.verbose(message),
+      this.fallback.log(`${title} – ${desc}`),
     );
   }
 
-  // ─── ERRORS ─────────────────────────────────────────────────────────────────
+  // ─── PUBLIC: send a structured error embed ─────────────────────────────────
 
-  error(message: string, trace?: string) {
-    const raw = this.buildRawEmbed('❌ API Error', 0xff0000, message, trace);
-    this.safeSendRaw(this.errorChannel, raw, () =>
-      this.fallback.error(message, trace),
-    );
-  }
-
-  errorEmbed(opts: IErrorEmbedOptions) {
-    // build fields as an array of APIEmbedFiel d objects without using addFields
+  /**
+   * Send a richly‐formatted error embed to the error channel.
+   * @param opts  Detailed error options
+   */
+  sendErrorEmbedOptions(opts: IErrorEmbedOptions) {
     const fields = [
       { name: 'Status', value: `${opts.httpStatus}`, inline: true },
       { name: 'Client IP', value: opts.clientIp, inline: true },
@@ -188,11 +173,19 @@ export class DiscordLoggerService implements LoggerService {
     };
 
     this.safeSendRaw(this.errorChannel, raw, () =>
-      this.fallback.error(opts.description, opts.stack),
+      this.fallback.error(`${opts.title} – ${opts.description}`, opts.stack),
     );
   }
 
-  // ─── METRICS ────────────────────────────────────────────────────────────────
+  // ─── EXISTING: LoggerService methods (no‐ops) ──────────────────────────────
+
+  log = () => {};
+  error = () => {};
+  warn = () => {};
+  debug = () => {};
+  verbose = () => {};
+
+  // ─── METRICS CHANNEL ───────────────────────────────────────────────────────
 
   metric(message: string) {
     if (this.metricsChannel?.isTextBased()) {
@@ -239,7 +232,7 @@ export class DiscordLoggerService implements LoggerService {
     }
   }
 
-  // ─── HELPERS ───────────────────────────────────────────────────────────────
+  // ─── PRIVATE HELPERS ───────────────────────────────────────────────────────
 
   private buildRawEmbed(
     title: string,

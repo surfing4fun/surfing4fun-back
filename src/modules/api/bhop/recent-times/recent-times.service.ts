@@ -29,7 +29,6 @@ export class RecentTimesService {
     const { page, pageSize, map, style, track } = query;
     const pageNum = Math.max(1, Number(page));
     const pageSizeNum = Math.max(1, Number(pageSize));
-
     const clauses: string[] = [];
     if (map) clauses.push(`pt.map = '${map}'`);
     if (typeof style === 'number') clauses.push(`pt.style = ${style}`);
