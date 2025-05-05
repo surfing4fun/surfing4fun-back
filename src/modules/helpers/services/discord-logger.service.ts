@@ -1,6 +1,8 @@
 import { Injectable, LoggerService } from '@nestjs/common';
 import { Client, TextChannel, GatewayIntentBits, APIEmbed } from 'discord.js';
 
+import { MetricsService } from './metrics.service';
+
 export interface IErrorEmbedOptions {
   title: string;
   description: string;
@@ -43,7 +45,7 @@ export class DiscordLoggerService implements LoggerService {
   private readonly ERR_ID = process.env.DISCORD_ERRORS_CHANNEL_ID!;
   private readonly METRICS_ID = process.env.DISCORD_METRICS_CHANNEL_ID!;
 
-  constructor() {
+  constructor(private readonly metrics: MetricsService) {
     this.client = new Client({ intents: [GatewayIntentBits.Guilds] });
     this.client.login(process.env.DISCORD_API_TOKEN);
     this.client.once('ready', async () => {
@@ -83,6 +85,15 @@ export class DiscordLoggerService implements LoggerService {
     );
   }
 
+  // ─── PUBLIC: send a structured warn embed ─────────────────────────────────────
+  sendWarnEmbed(title: string, desc: string) {
+    this.metrics.recordLog('warn');
+
+    const raw: APIEmbed = this.buildRawEmbed(title, 0xffa500, desc);
+    this.safeSendRaw(this.logChannel, raw, () =>
+      console.warn(`${title} – ${desc}`),
+    );
+  }
   // ─── PUBLIC: send a structured error embed ─────────────────────────────────
 
   /**
@@ -90,6 +101,7 @@ export class DiscordLoggerService implements LoggerService {
    * @param opts  Detailed error options
    */
   sendErrorEmbedOptions(opts: IErrorEmbedOptions) {
+    this.metrics.recordLog('error');
     const fields = [
       { name: 'Status', value: `${opts.httpStatus}`, inline: true },
       { name: 'Client IP', value: opts.clientIp, inline: true },

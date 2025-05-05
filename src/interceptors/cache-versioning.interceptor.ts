@@ -1,60 +1,55 @@
-import { createHash } from 'crypto';
+// src/modules/helpers/interceptors/cache-versioning.interceptor.ts
 
 import {
   Injectable,
   NestInterceptor,
   ExecutionContext,
   CallHandler,
+  Logger,
 } from '@nestjs/common';
-import { Response, Request } from 'express';
-import { Observable, EMPTY } from 'rxjs';
-import { mergeMap } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { MetricsService } from 'src/modules/helpers/services/metrics.service';
 
-/**
- * Adds:
- * - X-API-Version header
- * - Cache-Control header
- * - ETag header (SHA1 of the response body)
- */
+interface ICachedResponse {
+  timestamp: number;
+  data: any;
+}
 
 @Injectable()
 export class CacheVersioningInterceptor implements NestInterceptor {
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    const http = context.switchToHttp();
-    const res = http.getResponse<Response>();
-    const req = http.getRequest<Request>();
+  private readonly logger = new Logger(CacheVersioningInterceptor.name);
+  private readonly ttl = 60 * 1000; // 1 minute
+  private cache = new Map<string, ICachedResponse>();
 
-    // always set these
-    res.setHeader('X-API-Version', '1');
-    res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=120');
+  constructor(private readonly metrics: MetricsService) {} // ← inject MetricsService
+
+  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    const req = context.switchToHttp().getRequest<any>();
+    const key = this.cacheKey(req);
+    const now = Date.now();
+
+    const entry = this.cache.get(key);
+    if (entry && now - entry.timestamp < this.ttl) {
+      // CACHE HIT
+      this.metrics.recordCacheHit();
+      this.logger.log(`Cache hit for ${key}`);
+      return of(entry.data);
+    }
+
+    // CACHE MISS
+    this.metrics.recordCacheMiss();
+    this.logger.log(`Cache miss for ${key}`);
 
     return next.handle().pipe(
-      // after controller produces `body`
-      mergeMap((body) => {
-        if (
-          body &&
-          typeof body === 'object' &&
-          body.meta != null &&
-          body.data != null
-        ) {
-          const hash = createHash('sha1')
-            .update(JSON.stringify(body))
-            .digest('hex');
-          res.setHeader('ETag', hash);
-
-          if (req.headers['if-none-match'] === hash) {
-            // 1) send 304
-            res.status(304).end();
-            // 2) stop here
-            return EMPTY;
-          }
-        }
-        // if not a 304, keep flowing the real body
-        return new Observable((subscriber) => {
-          subscriber.next(body);
-          subscriber.complete();
-        });
+      tap((response) => {
+        this.cache.set(key, { timestamp: now, data: response });
       }),
     );
+  }
+
+  private cacheKey(req: any): string {
+    const { method, originalUrl, query, body } = req;
+    return `${method}:${originalUrl}:${JSON.stringify(query)}:${JSON.stringify(body)}`;
   }
 }

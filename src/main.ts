@@ -259,7 +259,7 @@ async function bootstrap() {
     new ObservabilityInterceptor(discordLogger, metrics),
     new WrapResponseInterceptor(),
     new ResponseTimeInterceptor(),
-    new CacheVersioningInterceptor(),
+    new CacheVersioningInterceptor(metrics),
     new PaginationHeadersInterceptor(),
   );
 

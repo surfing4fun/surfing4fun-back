@@ -7,16 +7,18 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-
-import { DiscordLoggerService } from '../modules/helpers/services/discord-logger.service';
-import { MetricsService } from '../modules/helpers/services/metrics.service';
+import { DiscordLoggerService } from 'src/modules/helpers/services/discord-logger.service';
+import { MetricsService } from 'src/modules/helpers/services/metrics.service';
 
 @Injectable()
 export class ObservabilityInterceptor implements NestInterceptor {
   private readonly internalLogger = new Logger('ObservabilityInterceptor');
 
+  /** Any request slower than this will emit a WARN */
+  private static readonly WARN_THRESHOLD_MS = 500; // e.g. 500ms
+
   constructor(
-    private readonly discordLogger: DiscordLoggerService,
+    private readonly discord: DiscordLoggerService,
     private readonly metrics: MetricsService,
   ) {}
 
@@ -30,16 +32,25 @@ export class ObservabilityInterceptor implements NestInterceptor {
         next: () => {
           const ms = Date.now() - start;
           this.metrics.recordRequest(`${method} ${url}`, ms, false);
-          this.discordLogger.sendLogEmbed(
-            `📗 [${method}] ${url}`,
-            `✅ completed in ${ms}ms`,
-          );
-          this.internalLogger.log(`[${method}] ${url} → ${ms}ms`);
+
+          if (ms > ObservabilityInterceptor.WARN_THRESHOLD_MS) {
+            const title = `📙 [${method}] ${url}`;
+            const desc = `⚠️ took ${ms}ms (>${ObservabilityInterceptor.WARN_THRESHOLD_MS}ms)`;
+            this.discord.sendWarnEmbed(title, desc);
+            this.internalLogger.warn(`[${method}] ${url} → ${ms}ms`);
+          } else {
+            const title = `📗 [${method}] ${url}`;
+            const desc = `✅ completed in ${ms}ms`;
+            this.discord.sendLogEmbed(title, desc);
+            this.internalLogger.log(`[${method}] ${url} → ${ms}ms`);
+          }
         },
         error: (err) => {
           const ms = Date.now() - start;
           this.metrics.recordRequest(`${method} ${url}`, ms, true);
-          this.internalLogger.error(`[${method}] ${url} → ${ms}ms`, err?.stack);
+
+          const msg = `❌ [${method}] ${url} → ${ms}ms`;
+          this.internalLogger.error(msg, err?.stack);
         },
       }),
     );
