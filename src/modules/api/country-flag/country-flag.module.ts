@@ -1,10 +1,10 @@
-import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
+import { HelpersModule } from 'src/modules/helpers/helpers.module';
 
 import { CountryFlagService } from './country-flag.service';
 
 @Module({
-  imports: [HttpModule],
+  imports: [HelpersModule],
   providers: [CountryFlagService],
   exports: [CountryFlagService],
 })

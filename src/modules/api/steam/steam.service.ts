@@ -1,12 +1,14 @@
-import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { AxiosInstance } from 'axios';
 
 @Injectable()
 export class SteamService {
   private readonly STEAM_API_KEY = process.env.STEAM_API_KEY;
   private readonly STEAM_BASE_ID = 76561197960265728n; // Use BigInt for large numbers
 
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    @Inject('AXIOS_INSTANCE') private readonly httpService: AxiosInstance,
+  ) {}
 
   private steamID3To64(accountId: number): string {
     return (this.STEAM_BASE_ID + BigInt(accountId)).toString();
@@ -26,7 +28,7 @@ export class SteamService {
       steamids: steamID64,
     };
 
-    const response = await this.httpService.get(url, { params }).toPromise();
+    const response = await this.httpService.get(url, { params });
     const players = response.data.response.players;
     if (players && players.length > 0) {
       const player = players[0];

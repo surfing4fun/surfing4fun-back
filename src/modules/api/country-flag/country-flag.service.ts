@@ -1,11 +1,11 @@
-import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
-import { firstValueFrom } from 'rxjs';
+import { Inject, Injectable } from '@nestjs/common';
+import { AxiosInstance } from 'axios';
 
 @Injectable()
 export class CountryFlagService {
-  constructor(private readonly httpService: HttpService) {}
-
+  constructor(
+    @Inject('AXIOS_INSTANCE') private readonly httpService: AxiosInstance,
+  ) {}
   private longToIp(ipLong: number): string {
     const ipBigInt = BigInt(ipLong);
     return [
@@ -19,7 +19,7 @@ export class CountryFlagService {
   async getCountryCodeByLongIp(ipLong: number): Promise<string> {
     const ip = this.longToIp(ipLong);
     const url = `https://api.country.is/${ip}`;
-    const response = await firstValueFrom(this.httpService.get(url));
+    const response = await this.httpService.get(url);
     return response.data.country;
   }
 

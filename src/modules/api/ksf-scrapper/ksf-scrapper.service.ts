@@ -1,7 +1,8 @@
-import { HttpService } from '@nestjs/axios';
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+// src/modules/api/ksf/ksf-scraper.service.ts
+
+import { Inject, Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { AxiosInstance } from 'axios';
 import * as cheerio from 'cheerio';
-import { firstValueFrom } from 'rxjs';
 
 interface ICacheEntry {
   timestamp: number;
@@ -13,16 +14,17 @@ export class KsfScraperService {
   private cache: Record<string, ICacheEntry> = {};
   private readonly CACHE_TTL = 120_000; // 120 seconds
 
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    @Inject('AXIOS_INSTANCE')
+    private readonly http: AxiosInstance,
+  ) {}
 
   private async fetchPage(url: string): Promise<cheerio.CheerioAPI> {
     try {
-      const response = await firstValueFrom(
-        this.httpService.get(url, {
-          headers: { 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64)' },
-          timeout: 5000,
-        }),
-      );
+      const response = await this.http.get(url, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64)' },
+        timeout: 5000,
+      });
       return cheerio.load(response.data);
     } catch (err: any) {
       throw new HttpException(
@@ -33,7 +35,6 @@ export class KsfScraperService {
   }
 
   private scrapeTop10($: cheerio.CheerioAPI): any[] {
-    // Only include elements that contain a player link
     const rows = $('div.grid-cols-subgrid')
       .filter((_, el) => $(el).find('a[href^="/players/"]').length > 0)
       .toArray()
@@ -117,7 +118,7 @@ export class KsfScraperService {
           bonusesRecords[bonusNumber] = records;
         }
       } catch {
-        // ignore individual option errors
+        // ignore errors for individual option loads
       }
     }
 
@@ -144,10 +145,12 @@ export class KsfScraperService {
         backwards: 'bw',
       };
 
-      const styleData: any = {};
+      const styleData: Record<string, any> = {};
       for (const [style, styleParam] of Object.entries(styles)) {
+        const url =
+          styleParam === '' ? baseUrl : `${baseUrl}?mode=${styleParam}`;
         styleData[style] = await this.scrapeMap(
-          styleParam ? `${baseUrl}?mode=${styleParam}` : baseUrl,
+          url,
           mapName,
           styleParam,
           fullList,
@@ -161,6 +164,7 @@ export class KsfScraperService {
       };
 
       this.cache[key] = { timestamp: now, data: result };
+      this.cache[key].timestamp = now;
       return result;
     } catch (err: any) {
       throw new HttpException(

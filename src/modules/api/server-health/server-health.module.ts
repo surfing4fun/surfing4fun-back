@@ -1,11 +1,11 @@
-import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
+import { HelpersModule } from 'src/modules/helpers/helpers.module';
 
 import { ServerHealthController } from './server-health.controller';
 import { ServerHealthService } from './server-health.service';
 
 @Module({
-  imports: [HttpModule],
+  imports: [HelpersModule],
   providers: [ServerHealthService],
   controllers: [ServerHealthController],
 })
