@@ -18,6 +18,10 @@ export class CountryFlagService {
 
   async getCountryCodeByLongIp(ipLong: number): Promise<string> {
     const ip = this.longToIp(ipLong);
+    return this.getCountryCodeByIp(ip);
+  }
+
+  async getCountryCodeByIp(ip: string): Promise<string> {
     const url = `https://api.country.is/${ip}`;
     const response = await this.httpService.get(url);
     return response.data.country;

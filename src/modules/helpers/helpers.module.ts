@@ -4,8 +4,12 @@ import { CacheVersioningInterceptor } from 'src/interceptors/cache-versioning.in
 
 import { createAxios } from './instances/axios.instance';
 import { DiscordLoggerService } from './services/discord-logger.service';
+import { DiscordServerStatusService } from './services/discord-server-status.service';
 import { MetricsDashboardService } from './services/metrics-dashboard.service';
 import { MetricsService } from './services/metrics.service';
+
+import { CountryFlagService } from '../api/country-flag/country-flag.service';
+import { ServerHealthService } from '../api/server-health/server-health.service';
 
 @Module({
   imports: [ScheduleModule.forRoot()],
@@ -14,6 +18,9 @@ import { MetricsService } from './services/metrics.service';
     MetricsService,
     MetricsDashboardService,
     CacheVersioningInterceptor,
+    DiscordServerStatusService,
+    ServerHealthService,
+    CountryFlagService,
     {
       provide: 'AXIOS_INSTANCE',
       useFactory: (metrics: MetricsService) => createAxios(metrics),
@@ -24,6 +31,7 @@ import { MetricsService } from './services/metrics.service';
     DiscordLoggerService,
     MetricsService,
     CacheVersioningInterceptor,
+    DiscordServerStatusService,
     'AXIOS_INSTANCE',
   ],
 })

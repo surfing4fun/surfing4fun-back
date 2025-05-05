@@ -1,4 +1,4 @@
-mport { Inject, Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Inject, Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { AxiosInstance } from 'axios';
 import * as cheerio from 'cheerio';
 

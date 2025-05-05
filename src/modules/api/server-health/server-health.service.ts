@@ -96,7 +96,7 @@ export class ServerHealthService {
     }
 
     const ip = process.env.SERVER_IP!;
-    const ports = Array.from({ length: 11 }, (_, i) => 27015 + i);
+    const ports = Array.from({ length: 8 }, (_, i) => 27015 + i);
 
     const infos = await Promise.all(
       ports.map((port) => this.fetchIServerInfo(ip, port)),
