@@ -1,5 +1,3 @@
-// src/modules/helpers/services/discord-server-status.service.ts
-
 import {
   Injectable,
   OnModuleInit,
