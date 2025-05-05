@@ -1,5 +1,3 @@
-// src/modules/api/server-health/server-health.service.ts
-
 import { Inject, Injectable } from '@nestjs/common';
 import { AxiosInstance } from 'axios';
 import * as query from 'source-server-query';

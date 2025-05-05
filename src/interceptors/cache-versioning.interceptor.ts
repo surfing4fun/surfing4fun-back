@@ -1,5 +1,3 @@
-// src/modules/helpers/interceptors/cache-versioning.interceptor.ts
-
 import {
   Injectable,
   NestInterceptor,

@@ -1,4 +1,3 @@
-// src/common/axios-instance.ts
 import axios, { AxiosInstance } from 'axios';
 
 import { MetricsService } from '../services/metrics.service';
