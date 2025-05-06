@@ -75,7 +75,7 @@ export class RecentRecordsService {
     );
 
     const summaries = await Promise.all(
-      paged.data.map((r) => this.steamService.getPlayerSummary(String(r.auth))),
+      paged.data.map((r) => this.steamService.getPlayerSummary(r.auth)),
     );
 
     const data: SurfRecentRecordDto[] = await Promise.all(

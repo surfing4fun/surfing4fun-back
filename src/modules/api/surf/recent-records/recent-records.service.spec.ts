@@ -1,107 +1,129 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { RecentRecordsService } from './recent-records.service';
-import { SurfPrismaService } from '../../../shared/prisma/surf.service';
 import { PaginatorService } from 'src/modules/helpers/services/paginator.service';
+
+import { SurfRecentRecordsQueryDto } from './dto/recent-records-query.dto';
+import { RecentRecordsService } from './recent-records.service';
+
+import { SurfPrismaService } from '../../../shared/prisma/surf.service';
 import { CountryFlagService } from '../../country-flag/country-flag.service';
 import { SteamService } from '../../steam/steam.service';
-import { SurfRecentRecordsQueryDto } from './dto/recent-records-query.dto';
 import { Style } from '../constants/styles.enum';
 import { Track } from '../constants/tracks.enum';
 
 describe('RecentRecordsService', () => {
   let service: RecentRecordsService;
 
-  // mocks
-  const mockPrismaService = {};
-  const mockPaginatorService = { paginate: jest.fn() };
-  const mockCountryFlagService = { getFlag: jest.fn() };
-  const mockSteamService = { getAvatarUrl: jest.fn() };
+  const mockPrisma = {} as any;
+  const mockPaginator: any = {
+    paginateSqlAutoCount: jest.fn(),
+  };
+  const mockCountry: any = {
+    getCountryCodeByLongIp: jest.fn(),
+    getCountryFlagByCountryCode: jest.fn(),
+  };
+  const mockSteam: any = {
+    getPlayerSummary: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         RecentRecordsService,
-        { provide: SurfPrismaService, useValue: mockPrismaService },
-        { provide: PaginatorService, useValue: mockPaginatorService },
-        { provide: CountryFlagService, useValue: mockCountryFlagService },
-        { provide: SteamService, useValue: mockSteamService },
+        { provide: SurfPrismaService, useValue: mockPrisma },
+        { provide: PaginatorService, useValue: mockPaginator },
+        { provide: CountryFlagService, useValue: mockCountry },
+        { provide: SteamService, useValue: mockSteam },
       ],
     }).compile();
 
     service = module.get<RecentRecordsService>(RecentRecordsService);
-  });
-
-  afterEach(() => {
     jest.resetAllMocks();
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
+  it('should call paginateSqlAutoCount and return meta & links unchanged', async () => {
+    const meta = {
+      total: 0,
+      page: 2,
+      pageSize: 5,
+      totalPages: 0,
+      hasNextPage: false,
+      hasPreviousPage: true,
+    };
+    const links = {
+      self: '',
+      first: '',
+      prev: '',
+      next: '',
+      last: '',
+    };
 
-  it('calls paginator.paginate with a queryable and returns meta & links unchanged', async () => {
-    const metaStub = { total: 1, page: 1, pageSize: 10 };
-    const linksStub = { first: '', prev: '', next: '', last: '' };
-
-    // Set paginate to return empty items
-    mockPaginatorService.paginate.mockResolvedValue({
-      items: [],
-      meta: metaStub,
-      links: linksStub,
+    // Tell TS this is a Jest mock
+    (mockPaginator.paginateSqlAutoCount as jest.Mock).mockResolvedValue({
+      data: [],
+      meta,
+      links,
     });
 
     const dto = new SurfRecentRecordsQueryDto();
     dto.page = 2;
     dto.pageSize = 5;
     dto.map = 'surf_utopia';
-    dto.style = 0;
-    dto.track = 1;
+    dto.style = Style[0];
+    dto.track = Track[1];
 
     const result = await service.getRecentRecords(dto);
 
-    // paginate called exactly once
-    expect(mockPaginatorService.paginate).toHaveBeenCalledTimes(1);
-
-    // First argument is an object with `query` and `count` functions
-    const [queryableArg] = mockPaginatorService.paginate.mock.calls[0];
-    expect(queryableArg).toEqual({
-      query: expect.any(Function),
-      count: expect.any(Function),
-    });
-
-    // Service should return meta & links as-is
-    expect(result.meta).toBe(metaStub);
-    expect(result.links).toBe(linksStub);
+    expect(mockPaginator.paginateSqlAutoCount).toHaveBeenCalledTimes(1);
+    expect(result.meta).toBe(meta);
+    expect(result.links).toBe(links);
     expect(result.data).toEqual([]);
   });
 
-  it('maps raw records into SurfRecentRecordDto correctly', async () => {
-    // raw record shape as returned by Prisma
-    const rawRecord = {
-      date: 1622470423,
+  it('should map raw records into SurfRecentRecordDto correctly', async () => {
+    const raw: any = {
+      id: 1,
+      auth: 'user123',
       map: 'surf_utopia',
-      country: 'BR',
-      steamId: 'STEAM_1:0:12345',
-      runTimeDifference: 150,
-      style: 1, // Sideways
+      track: 0,
+      time: 100,
+      points: 50,
+      date: 123456,
+      style: 1,
+      user_auth: 'user123',
+      user_ip: '1.2.3.4',
+      map_type: 'typeA',
       tier: 3,
-      track: 0, // Main
+      second_best_time: 80,
+    };
+    const meta = {
+      total: 1,
+      page: 1,
+      pageSize: 10,
+      totalPages: 1,
+      hasNextPage: false,
+      hasPreviousPage: false,
+    };
+    const links = {
+      self: '',
+      first: '',
+      prev: null,
+      next: null,
+      last: '',
     };
 
-    const metaStub = { total: 1, page: 1, pageSize: 10 };
-    const linksStub = { first: '', prev: '', next: '', last: '' };
-
-    mockPaginatorService.paginate.mockResolvedValue({
-      items: [rawRecord],
-      meta: metaStub,
-      links: linksStub,
+    (mockPaginator.paginateSqlAutoCount as jest.Mock).mockResolvedValue({
+      data: [raw],
+      meta,
+      links,
     });
 
-    // stub dependent services
-    mockCountryFlagService.getFlag.mockReturnValue('🇧🇷');
-    mockSteamService.getAvatarUrl.mockResolvedValue(
-      'https://avatars.example/steam123.png',
-    );
+    mockSteam.getPlayerSummary.mockResolvedValue({
+      nickname: 'Nick',
+      profileUrl: '/p',
+      avatar: 'ava.png',
+    });
+    mockCountry.getCountryCodeByLongIp.mockResolvedValue('BR');
+    mockCountry.getCountryFlagByCountryCode.mockResolvedValue('🇧🇷');
 
     const dto = new SurfRecentRecordsQueryDto();
     dto.page = 1;
@@ -109,25 +131,31 @@ describe('RecentRecordsService', () => {
 
     const result = await service.getRecentRecords(dto);
 
-    expect(result.data).toHaveLength(1);
-    const mapped = result.data[0];
+    expect(mockSteam.getPlayerSummary).toHaveBeenCalledWith(raw.auth);
+    expect(mockCountry.getCountryCodeByLongIp).toHaveBeenCalledWith(
+      raw.user_ip,
+    );
+    expect(mockCountry.getCountryFlagByCountryCode).toHaveBeenCalledWith('BR');
 
-    // basic fields passthrough
-    expect(mapped.date).toBe(rawRecord.date);
-    expect(mapped.map).toBe(rawRecord.map);
+    const item = result.data[0];
+    expect(item.date).toBe(raw.date);
+    expect(item.map).toBe(raw.map);
+    expect(item.mapType).toBe(raw.map_type);
+    expect(item.player).toBe(raw.user_auth);
+    expect(item.playerNickname).toBe('Nick');
+    expect(item.playerProfileUrl).toBe('/p');
+    expect(item.playerAvatar).toBe('ava.png');
+    expect(item.playerLocationCountry).toBe('BR');
+    expect(item.playerLocationCountryFlag).toBe('🇧🇷');
+    expect(item.points).toBe(raw.points);
+    expect(item.rank).toBe(1);
+    expect(item.runTime).toBe(raw.time);
+    expect(item.runTimeDifference).toBe(raw.time - raw.second_best_time);
+    expect(item.style).toBe(Style[raw.style]);
+    expect(item.tier).toBe(raw.tier);
+    expect(item.track).toBe(Track[raw.track]);
 
-    // transformations
-    expect(mapped.countryFlag).toBe('🇧🇷');
-    expect(mapped.avatarUrl).toBe('https://avatars.example/steam123.png');
-    expect(mapped.runTimeDifference).toBe(rawRecord.runTimeDifference);
-
-    // enum lookups
-    expect(mapped.style).toBe(Style[rawRecord.style]);
-    expect(mapped.tier).toBe(rawRecord.tier);
-    expect(mapped.track).toBe(Track[rawRecord.track]);
-
-    // also meta/links
-    expect(result.meta).toBe(metaStub);
-    expect(result.links).toBe(linksStub);
+    expect(result.meta).toBe(meta);
+    expect(result.links).toBe(links);
   });
 });

@@ -1,4 +1,3 @@
-// src/modules/api/payment/stripe/spec/stripe.service.spec.ts
 import { StripeService } from '../stripe.service';
 
 describe('StripeService', () => {

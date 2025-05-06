@@ -1,5 +1,3 @@
-// src/modules/api/core/auth/guards/permission.guard.spec.ts
-
 import { Reflector } from '@nestjs/core';
 import { normalizePermissions } from 'src/utils/normalizePermissions';
 

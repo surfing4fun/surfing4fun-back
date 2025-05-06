@@ -1,5 +1,3 @@
-// src/modules/api/core/auth/auth.controller.spec.ts
-
 import { normalizePermissions } from 'src/utils/normalizePermissions';
 
 import { PaymentService } from '../../../payment/payment.service';

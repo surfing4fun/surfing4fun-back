@@ -1,5 +1,3 @@
-// src/modules/api/core/auth/guards/jwt.guard.spec.ts
-
 import { UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 

@@ -1,5 +1,3 @@
-// src/modules/api/core/auth/auth.service.spec.ts
-
 import { EmailService } from 'src/modules/shared/email/email.service';
 import { normalizePermissions } from 'src/utils/normalizePermissions';
 

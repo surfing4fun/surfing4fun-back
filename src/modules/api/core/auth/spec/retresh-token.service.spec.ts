@@ -1,5 +1,3 @@
-// src/modules/api/core/auth/refresh-token.service.spec.ts
-
 import { UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { DashboardPrismaService } from 'src/modules/shared/prisma/dashboard.service';
