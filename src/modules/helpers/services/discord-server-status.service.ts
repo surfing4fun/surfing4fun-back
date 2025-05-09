@@ -129,41 +129,55 @@ export class DiscordServerStatusService implements OnModuleInit {
       // ignore
     }
 
+    const svMode =
+      info.map.slice(0, 4).toLowerCase() === 'surf' ? 'surf' : 'bhop';
+
     const fields = [
-      { name: 'Status', value: '🟢 Online', inline: true },
-      { name: 'Address', value: `${this.SERVER_IP}:${port}`, inline: true },
       {
-        name: 'Country',
+        name: '',
+        value: '',
+        inline: false,
+      },
+      { name: '**Status**', value: '🟢 Online', inline: true },
+      {
+        name: `Current Map`,
+        value: `[${info.map}](https://surfing4.fun/index.php?sv=${svMode}&m=${info.map})`,
+        inline: true,
+      },
+      {
+        name: '**Players**',
+        value: `${online - info.bots}/${max} (${pct}%)`,
+        inline: true,
+      },
+      {
+        name: '',
+        value: '',
+        inline: false,
+      },
+      {
+        name: '**Country**',
         value: countryCode
           ? `${flag ? `${flag} ` : ''}${countryCode}`
           : 'Unknown',
         inline: true,
       },
-      { name: 'Map', value: info.map, inline: true },
-      {
-        name: 'Players',
-        value: `${online - info.bots}/${max} (${pct}%)`,
-        inline: true,
-      },
-      { name: 'Bots', value: `${info.bots}`, inline: true },
-      { name: 'Type', value: info.serverType, inline: true },
-      { name: 'OS', value: info.environment, inline: true },
-      { name: 'Visibility', value: info.visibility, inline: true },
-      { name: 'VAC', value: info.vac, inline: true },
-      { name: 'Version', value: info.version, inline: true },
+      { name: '**VAC**', value: info.vac, inline: true },
+      { name: '**Version**', value: info.version, inline: true },
     ];
 
     return {
-      title: info.name,
-      description: `Connect: steam://connect/${host}:${port}`,
+      description: `**Connect:**  steam://connect/${host}:${port}`,
       color: 0x00b300,
-      fields,
       footer: {
-        text: `Surfing4Fun - API - Server Status - Updated: ${timestamp.toLocaleString()}`,
+        text: `Surfing4Fun   -   API   -   Server Status   -   Last update: ${timestamp.toLocaleString()}`,
+        icon_url: 'https://surfing4.fun/assets/img/logo.webp',
       },
-      timestamp: timestamp.toISOString(),
-      image: {
-        url: `https://i.ibb.co/RqM1cjY/New-Project.png`,
+      author: {
+        name: info.name,
+      },
+      fields,
+      thumbnail: {
+        url: `https://raw.githubusercontent.com/surfing4fun/surfing4fun-back/refs/heads/feature/database_endpoints/public/assets/images/s4f4k.png`,
       },
     };
   }
@@ -183,22 +197,6 @@ export class DiscordServerStatusService implements OnModuleInit {
         inline: true,
       },
       { name: 'Players', value: '0', inline: true },
-      { name: 'Bots', value: '0', inline: true },
-      {
-        name: 'Type',
-        value: last?.serverType ?? 'unknown',
-        inline: true,
-      },
-      {
-        name: 'OS',
-        value: last?.environment ?? 'unknown',
-        inline: true,
-      },
-      {
-        name: 'Visibility',
-        value: last?.visibility ?? 'unknown',
-        inline: true,
-      },
       {
         name: 'VAC',
         value: last?.vac ?? 'unknown',
