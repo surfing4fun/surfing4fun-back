@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { EmailService } from 'src/modules/shared/email/email.service';
 import { normalizePermissions } from 'src/utils/normalizePermissions';
 
-import { User } from '../users/entity/user';
-import { PaymentService } from '../../payment/payment.service';
-
 import { RefreshTokenService } from './refresh-token.service';
+
+import { PaymentService } from '../../payment/payment.service';
+import { User } from '../users/entity/user';
 
 @Injectable()
 export class AuthService {

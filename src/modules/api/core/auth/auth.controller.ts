@@ -8,19 +8,19 @@ import {
   Response,
   UseGuards,
 } from '@nestjs/common';
-import { Public } from 'src/decorators/Public';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { normalizePermissions } from 'src/utils/normalizePermissions';
 import { AuthGuard } from '@nestjs/passport';
-
-import { UsersService } from '../users/users.service';
-import { PaymentService } from '../../payment/payment.service';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Public } from 'src/decorators/Public.decorator';
+import { normalizePermissions } from 'src/utils/normalizePermissions';
 
 import { AuthService } from './auth.service';
-import { JwtRefreshAuthGuard } from './guards/jwt-refresh-auth.guard';
-import { RefreshTokenService } from './refresh-token.service';
 import { cookieConstants } from './constants';
+import { JwtRefreshAuthGuard } from './guards/jwt-refresh-auth.guard';
 import { JwtAuthGuard } from './guards/jwt.guard';
+import { RefreshTokenService } from './refresh-token.service';
+
+import { PaymentService } from '../../payment/payment.service';
+import { UsersService } from '../users/users.service';
 
 @ApiTags('auth')
 @Controller('auth')

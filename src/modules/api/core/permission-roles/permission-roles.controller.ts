@@ -11,12 +11,12 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
-import { PermissionsService } from '../permissions/permissions.service';
-import { RolesService } from '../roles/roles.service';
-
-import { PermissionRolesService } from './permission-roles.service';
 import { CreatePermissionRoleDto } from './dto/create-permission-role.dto';
 import { UpdatePermissionRoleDto } from './dto/update-permission-role.dto';
+import { PermissionRolesService } from './permission-roles.service';
+
+import { PermissionsService } from '../permissions/permissions.service';
+import { RolesService } from '../roles/roles.service';
 
 @ApiTags('permission-roles')
 @ApiBearerAuth()
