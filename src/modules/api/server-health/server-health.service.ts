@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { HttpService } from '@nestjs/axios';
+import { Inject, Injectable } from '@nestjs/common';
+import { AxiosInstance } from 'axios';
 import * as query from 'source-server-query';
 
 interface IPlayerInfo {
@@ -34,7 +34,10 @@ export class ServerHealthService {
   private lastCacheTime = 0;
   private readonly CACHE_TTL = 30 * 1000; // 30 seconds
 
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    @Inject('AXIOS_INSTANCE')
+    private readonly http: AxiosInstance,
+  ) {}
 
   private async fetchIServerInfo(
     ip: string,
@@ -44,7 +47,6 @@ export class ServerHealthService {
       const info = await query.info(ip, port, 1500);
       const players = await query.players(ip, port, 1500);
 
-      // mappings
       const serverTypeMap: Record<string, string> = {
         d: 'dedicated',
         l: 'listen',
@@ -83,7 +85,6 @@ export class ServerHealthService {
         })),
       };
     } catch {
-      // unreachable or offline
       return null;
     }
   }
@@ -94,8 +95,8 @@ export class ServerHealthService {
       return this.cache;
     }
 
-    const ip = process.env.SERVER_IP;
-    const ports = Array.from({ length: 11 }, (_, i) => 27015 + i);
+    const ip = process.env.SERVER_IP!;
+    const ports = Array.from({ length: 8 }, (_, i) => 27015 + i);
 
     const infos = await Promise.all(
       ports.map((port) => this.fetchIServerInfo(ip, port)),
