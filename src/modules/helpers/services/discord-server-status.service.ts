@@ -133,11 +133,6 @@ export class DiscordServerStatusService implements OnModuleInit {
       info.map.slice(0, 4).toLowerCase() === 'surf' ? 'surf' : 'bhop';
 
     const fields = [
-      {
-        name: '',
-        value: '',
-        inline: false,
-      },
       { name: '**Status**', value: '🟢 Online', inline: true },
       {
         name: `Current Map`,
@@ -148,11 +143,6 @@ export class DiscordServerStatusService implements OnModuleInit {
         name: '**Players**',
         value: `${online - info.bots}/${max} (${pct}%)`,
         inline: true,
-      },
-      {
-        name: '',
-        value: '',
-        inline: false,
       },
       {
         name: '**Country**',
