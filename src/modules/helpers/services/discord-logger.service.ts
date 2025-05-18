@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { Injectable, LoggerService } from '@nestjs/common';
 import { Client, TextChannel, GatewayIntentBits, APIEmbed } from 'discord.js';
 

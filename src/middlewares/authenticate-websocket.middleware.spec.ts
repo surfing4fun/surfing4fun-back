@@ -1,4 +1,6 @@
-// surfing4fun-back/src/middlewares/authenticate-websocket.middleware.spec.ts
+/* eslint-disable import/order */
+import { JwtService } from '@nestjs/jwt';
+import { Socket } from 'socket.io';
 
 // 1) Mock JwtStrategy before any imports from it:
 const mockValidate = jest.fn();
@@ -7,9 +9,6 @@ jest.mock('src/modules/api/core/auth/strategies/jwt.strategy', () => ({
     validate: mockValidate,
   })),
 }));
-
-import { JwtService } from '@nestjs/jwt';
-import { Socket } from 'socket.io';
 
 // real entities:
 import { IAuthenticatedUser } from 'src/modules/api/core/auth/dto/authenticate-user.dto';

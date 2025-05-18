@@ -1,9 +1,10 @@
 // auth/strategies/jwt-refresh.strategy.spec.ts
 
-import { JwtRefreshStrategy } from '../jwt-refresh.strategy';
 import { UnauthorizedException } from '@nestjs/common';
 
-interface FakeUser {
+import { JwtRefreshStrategy } from '../jwt-refresh.strategy';
+
+interface IFakeUser {
   id: string;
   username: string;
   permissions: any[];
@@ -38,18 +39,18 @@ describe('JwtRefreshStrategy', () => {
   it('should return user data plus refreshTokenExpiresAt when found', async () => {
     const now = Math.floor(Date.now() / 1000);
     const payload = { sub: 'u42', exp: now + 7200 };
-    const fakeUser: FakeUser = {
+    const IfakeUser: IFakeUser = {
       id: 'u42',
       username: 'jane.doe',
       permissions: [{ name: 'roles', read: true }],
     };
-    usersService.findOne.mockResolvedValue(fakeUser);
+    usersService.findOne.mockResolvedValue(IfakeUser);
 
     const result = await strategy.validate(payload);
 
     // returned object should spread the user and add the expiration date
     expect(result).toMatchObject({
-      ...fakeUser,
+      ...IfakeUser,
       refreshTokenExpiresAt: new Date((now + 7200) * 1000),
     });
   });

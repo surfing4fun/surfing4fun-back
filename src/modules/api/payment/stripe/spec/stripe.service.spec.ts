@@ -37,7 +37,6 @@ describe('StripeService', () => {
     };
 
     service = new StripeService();
-    // @ts-ignore override private api instance
     service['api'] = fakeApi;
   });
 
