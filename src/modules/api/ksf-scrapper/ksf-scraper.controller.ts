@@ -6,7 +6,6 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { Public } from 'src/decorators/Public';
 import {
   ApiBadRequestResponse,
   ApiOkResponse,
@@ -15,6 +14,7 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
+import { Public } from 'src/decorators/Public.decorator';
 
 import { KsfScraperService } from './ksf-scrapper.service';
 

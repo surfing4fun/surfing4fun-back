@@ -45,6 +45,7 @@ model maptiers {
   possible_on_scroll  Boolean?          @default(true)
   possible_on_stamina Boolean?          @default(true)
   map_type            maptiers_map_type @default(Linear)
+  playertimes         playertimes[]
 }
 
 model mapzones {
@@ -72,20 +73,21 @@ model migrations {
 }
 
 model playertimes {
-  id          Int    @id @default(autoincrement())
-  style       Int    @default(0) @db.TinyInt
-  track       Int    @default(0) @db.TinyInt
-  time        Float  @db.Float
+  id          Int      @id @default(autoincrement())
+  style       Int      @default(0) @db.TinyInt
+  track       Int      @default(0) @db.TinyInt
+  time        Float    @db.Float
   auth        Int?
-  map         String @db.VarChar(255)
-  points      Float  @default(0) @db.Float
+  map         String   @db.VarChar(255)
+  points      Float    @default(0) @db.Float
   jumps       Int?
   date        Int?
   strafes     Int?
-  sync        Float? @db.Float
-  perfs       Float? @default(0) @db.Float
-  completions Int?   @default(1) @db.SmallInt
-  users       users? @relation(fields: [auth], references: [auth], onDelete: Restrict, onUpdate: Restrict, map: "pt_auth")
+  sync        Float?   @db.Float
+  perfs       Float?   @default(0) @db.Float
+  completions Int?     @default(1) @db.SmallInt
+  maptiers    maptiers @relation(fields: [map], references: [map], onUpdate: Restrict, map: "fk_playertimes_map")
+  users       users?   @relation(fields: [auth], references: [auth], onDelete: Restrict, onUpdate: Restrict, map: "pt_auth")
 
   @@index([auth, date, points], map: "auth")
   @@index([date(sort: Desc), auth, map, style, time, points, track], map: "idx_playertimes_covering")

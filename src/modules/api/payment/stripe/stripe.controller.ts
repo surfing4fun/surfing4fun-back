@@ -11,14 +11,14 @@ import {
   Req,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Public } from 'src/decorators/Public';
 import { ApiTags } from '@nestjs/swagger';
+import { Public } from 'src/decorators/Public.decorator';
+
+import { CreateCheckoutSessionDto } from './dto/create-checkout-session.dto';
+import { StripeWebhooksService } from './stripe-webhooks.service';
+import { StripeService } from './stripe.service';
 
 import { UsersService } from '../../core/users/users.service';
-
-import { StripeService } from './stripe.service';
-import { StripeWebhooksService } from './stripe-webhooks.service';
-import { CreateCheckoutSessionDto } from './dto/create-checkout-session.dto';
 
 @Public()
 @ApiTags('stripe')

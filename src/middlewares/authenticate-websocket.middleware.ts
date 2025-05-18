@@ -1,5 +1,5 @@
-import { Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
+import { Socket } from 'socket.io';
 import { IAuthenticatedUser } from 'src/modules/api/core/auth/dto/authenticate-user.dto';
 import { JwtStrategy } from 'src/modules/api/core/auth/strategies/jwt.strategy';
 
