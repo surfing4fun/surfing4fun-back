@@ -129,14 +129,18 @@ export class DiscordServerStatusService implements OnModuleInit {
       // ignore
     }
 
-    const svMode =
+    const gamemode =
       info.map.slice(0, 4).toLowerCase() === 'surf' ? 'surf' : 'bhop';
 
     const fields = [
-      { name: '**Status**', value: '🟢 Online', inline: true },
       {
-        name: `Current Map`,
-        value: `[${info.map}](https://surfing4.fun/index.php?sv=${svMode}&m=${info.map})`,
+        name: '**Status**',
+        value: '<:AYAYAY:1326334390460092466> Online',
+        inline: true,
+      },
+      {
+        name: `**Current Map**`,
+        value: `[${info.map}](https://surfing4.fun/index.php?sv=${gamemode}&m=${info.map}&s=0&t=-1)`,
         inline: true,
       },
       {
@@ -156,10 +160,10 @@ export class DiscordServerStatusService implements OnModuleInit {
     ];
 
     return {
-      description: `**Connect:**  steam://connect/${host}:${port}`,
+      description: `**IP Address:**  __steam://connect/${host}:${port}__`,
       color: 0x00b300,
       footer: {
-        text: `Surfing4Fun   -   API   -   Server Status   -   Last update: ${timestamp.toLocaleString()}`,
+        text: `Surfing4Fun  -  API  -  Server Status  -  Last update: ${timestamp.toLocaleString()}`,
         icon_url: 'https://surfing4.fun/assets/img/logo.webp',
       },
       author: {
@@ -167,7 +171,7 @@ export class DiscordServerStatusService implements OnModuleInit {
       },
       fields,
       thumbnail: {
-        url: `https://raw.githubusercontent.com/surfing4fun/surfing4fun-back/refs/heads/feature/database_endpoints/public/assets/images/s4f4k.png`,
+        url: `https://surfing4.fun/assets/img/maps/${gamemode}/${info.map}.webp`,
       },
     };
   }
@@ -175,7 +179,11 @@ export class DiscordServerStatusService implements OnModuleInit {
   private buildOfflineEmbed(port: number, timestamp: Date): APIEmbed {
     const last = this.lastInfo.get(port);
     const fields = [
-      { name: 'Status', value: '🔴 Offline', inline: true },
+      {
+        name: 'Status',
+        value: '<:angery:1107470462944030831> Offline',
+        inline: true,
+      },
       {
         name: 'Address',
         value: `\`${this.SERVER_IP}:${port}\``,
