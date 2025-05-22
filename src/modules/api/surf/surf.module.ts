@@ -6,6 +6,7 @@ import { RecentRecordsModule } from './recent-records/recent-records.module';
 import { RecentTimesModule } from './recent-times/recent-times.module';
 import { ServerStatusModule } from './server-status/server-status.module';
 import { UsersModule } from './users/users.module';
+import { UserProfileModule } from './user-profile/user-profile.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { UsersModule } from './users/users.module';
     ServerStatusModule,
     RecentTimesModule,
     RecentRecordsModule,
+    UserProfileModule,
     RouterModule.register([
       {
         path: 'surf',
