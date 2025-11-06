@@ -92,16 +92,34 @@ export class UserProfileDto {
   totalPlayedMaps: number;
 
   @ApiProperty({
+    example: 150,
+    description: 'Total number of maps that exists in the server',
+  })
+  totalMapsCount: number;
+
+  @ApiProperty({
     example: 50,
     description: 'Total number of bonus maps the player has run',
   })
   totalPlayedMapsBonus: number;
 
   @ApiProperty({
+    example: 150,
+    description: 'Total number of map bonuses that exists in the server',
+  })
+  totalBonusCount: number;
+
+  @ApiProperty({
     example: 300,
     description: 'Total number of individual stages the player has run',
   })
   totalPlayedStages: number;
+
+  @ApiProperty({
+    example: 150,
+    description: 'Total number of maps stages that exists in the server',
+  })
+  totalStagesCount: number;
 
   @ApiProperty({
     type: MapCompletionDto,

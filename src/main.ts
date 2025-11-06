@@ -266,6 +266,11 @@ async function bootstrap() {
   // Global filters
   app.useGlobalFilters(new HttpErrorFilter(discordLogger));
 
+  // We use bigInt in the database - This is a patch so we don need to parse
+  (BigInt.prototype as any).toJSON = function () {
+    return this.toString();
+  };
+
   await app.listen(process.env.API_PORT);
 }
 
